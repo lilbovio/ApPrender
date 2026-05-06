@@ -1,39 +1,64 @@
-/* Login.module.css — Diseño colorido y amigable para niños */
+/* Login.module.css — Splash Screen */
 
+/* Animación Bob (del mockup) */
+@keyframes bob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+/* Animación Float */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+/* Container principal */
 .loginContainer {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--accent) 100%);
-  position: relative;
+  width: 100%;
   overflow: hidden;
 }
 
-/* Decoración de fondo con formas geométricas */
-.loginContainer::before {
-  content: '';
-  position: absolute;
-  top: -50px;
-  right: -80px;
-  width: 300px;
-  height: 300px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 50%;
-  z-index: 1;
-  animation: float 6s ease-in-out infinite;
+/* ═══ SPLASH SCREEN ═══ */
+.splashScreen {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--accent) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
 }
 
-.loginContainer::after {
-  content: '';
+/* Decoraciones de fondo */
+.decorBg1 {
   position: absolute;
-  bottom: -100px;
-  left: -100px;
-  width: 400px;
-  height: 400px;
-  background: rgba(236, 72, 153, 0.1);
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
-  z-index: 1;
-  animation: float 8s ease-in-out infinite reverse;
+  top: -100px;
+  left: -100px;
+  animation: float 8s ease-in-out infinite;
+}
+
+.decorBg2 {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  bottom: -80px;
+  right: -80px;
+  animation: float 6s ease-in-out infinite reverse;
 }
 
 @keyframes float {
