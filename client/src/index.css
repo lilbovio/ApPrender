@@ -1,5 +1,160 @@
-body {
+
+:root {
+  /* Colores Primarios - Amigables para niños */
+  --primary: #7C3AED;           /* Púrpura vibrante (principal) */
+  --primary-light: #a855f7;     /* Púrpura claro */
+  --primary-dark: #6d28d9;      /* Púrpura oscuro */
+  
+  /* Colores Secundarios */
+  --secondary: #ec4899;         /* Rosa/Magenta brillante */
+  --accent: #06b6d4;            /* Cyan/Turquesa */
+  --accent-light: #22d3ee;      /* Cyan claro */
+  
+  /* Colores de Soporte */
+  --success: #10b981;           /* Verde éxito */
+  --warning: #f59e0b;           /* Ámbar/Naranja */
+  --error: #ef4444;             /* Rojo error */
+  --info: #3b82f6;              /* Azul información */
+  
+  /* Colores por Materia */
+  --english: #7C3AED;           /* Inglés - Púrpura */
+  --math: #ec4899;              /* Matemáticas - Rosa */
+  
+  /* Fondos y Grises */
+  --bg: #f8fafc;                /* Fondo principal - azul muy claro */
+  --bg-secondary: #f1f5f9;      /* Fondo secundario */
+  --card: #ffffff;              /* Fondo tarjetas */
+  --hover: #f0f9ff;             /* Hover estado */
+  
+  /* Textos */
+  --text: #1e293b;              /* Texto principal - azul oscuro */
+  --text-secondary: #64748b;    /* Texto secundario - gris */
+  --text-muted: #94a3b8;        /* Texto deshabilitado - gris claro */
+  
+  /* Bordes */
+  --border: #e2e8f0;            /* Borde estándar */
+  --border-light: #f1f5f9;      /* Borde claro */
+  
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  
+  /* Espaciado */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  
+  /* Tipografía */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 32px;
+  
+  /* Transiciones */
+  --transition: all 0.3s ease;
+  --transition-fast: all 0.15s ease;
+  --transition-slow: all 0.6s ease;
+}
+
+/* Reset Global */
+* {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Body */
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Links */
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition);
+}
+
+/* Botones */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Inputs */
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Imágenes */
+img {
+  max-width: 100%;
+  display: block;
+  height: auto;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: var(--radius-lg);
+  transition: var(--transition);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Utilidades básicas */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
