@@ -2,89 +2,51 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Home.module.css";
 
+import { apiRequest } from "../../services/api";
+
 /**
  * Home — Dashboard principal (Enfocado en Inglés)
- * Muestra: progreso, racha, logros y temas de inglés
- * MODO DEMO: Datos simulados para navegar sin backend
  */
 const Home = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [stats, setStats] = useState({ xp: 0, streak: 0 });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Cargar datos desde localStorage (simulado en Login)
     const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
+    if (savedUser) setUser(JSON.parse(savedUser));
 
-    // Datos DEMO de lecciones de Inglés
-    const demoLessons = [
-      {
-        id: 1,
-        title: "Saludos y Presentación",
-        icon: "👋",
-        xp: 50,
-        completed: true,
-        progress: 100,
-        grade: "Grado 1",
-      },
-      {
-        id: 2,
-        title: "Números del 1-10",
-        icon: "🔢",
-        xp: 75,
-        completed: true,
-        progress: 100,
-        grade: "Grado 1",
-      },
-      {
-        id: 3,
-        title: "Colores Básicos",
-        icon: "🎨",
-        xp: 60,
-        completed: false,
-        progress: 65,
-        grade: "Grado 1",
-      },
-      {
-        id: 4,
-        title: "Animales Comunes",
-        icon: "🐶",
-        xp: 80,
-        completed: false,
-        progress: 30,
-        grade: "Grado 2",
-      },
-      {
-        id: 5,
-        title: "Partes del Cuerpo",
-        icon: "👨",
-        xp: 70,
-        completed: false,
-        progress: 0,
-        grade: "Grado 2",
-      },
-      {
-        id: 6,
-        title: "Comidas y Bebidas",
-        icon: "🍎",
-        xp: 85,
-        completed: false,
-        progress: 0,
-        grade: "Grado 2",
-      },
-    ];
+    const fetchHomeData = async () => {
+      try {
+        // Fetch english lessons and progress for dashboard
+        const [fetchedLessons, progress] = await Promise.all([
+          apiRequest("/lessons/english"),
+          apiRequest("/progress/english")
+        ]);
 
-    setLessons(demoLessons);
+        const completedIds = progress.completedLessons.map(l => typeof l === 'object' ? l._id : l) || [];
 
-    // Stats demo
-    setStats({
-      xp: 1250,
-      streak: 7,
-    });
+        const lessonsWithStatus = fetchedLessons.map(lesson => ({
+          ...lesson,
+          completed: completedIds.includes(lesson._id),
+          progress: completedIds.includes(lesson._id) ? 100 : 0
+        }));
+
+        setLessons(lessonsWithStatus);
+        setStats({
+          xp: progress.xp || 0,
+          streak: progress.streak || 0,
+        });
+      } catch (error) {
+        console.error("Error fetching home data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHomeData();
   }, []);
 
   const handleLessonClick = (lessonId) => {
@@ -117,7 +79,15 @@ const Home = () => {
             onClick={() => navigate("/profile")}
             title="Ir al perfil"
           >
-            👤
+            {user?.avatar ? (
+              <img 
+                src={user.avatar} 
+                alt="Avatar" 
+                style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} 
+              />
+            ) : (
+              "👤"
+            )}
           </div>
         </div>
       </div>
@@ -166,14 +136,14 @@ const Home = () => {
       <h4 className={styles.gradeTitle}>🎯 Grado 1</h4>
       <div className={styles.lessonsContainer}>
         {lessons
-          .filter((l) => l.grade === "Grado 1")
+          .filter((l) => l.grade === "1")
           .map((lesson) => (
             <div
-              key={lesson.id}
+              key={lesson._id}
               className={`${styles.lessonCard} ${
                 lesson.completed ? styles.lessonCompleted : ""
               }`}
-              onClick={() => handleLessonClick(lesson.id)}
+              onClick={() => handleLessonClick(lesson._id)}
             >
               <div className={styles.lessonHeader}>
                 <div className={styles.lessonIcon}>{lesson.icon}</div>
@@ -199,14 +169,14 @@ const Home = () => {
       <h4 className={styles.gradeTitle}>⭐ Grado 2</h4>
       <div className={styles.lessonsContainer}>
         {lessons
-          .filter((l) => l.grade === "Grado 2")
+          .filter((l) => l.grade === "2")
           .map((lesson) => (
             <div
-              key={lesson.id}
+              key={lesson._id}
               className={`${styles.lessonCard} ${
                 lesson.completed ? styles.lessonCompleted : ""
               }`}
-              onClick={() => handleLessonClick(lesson.id)}
+              onClick={() => handleLessonClick(lesson._id)}
             >
               <div className={styles.lessonHeader}>
                 <div className={styles.lessonIcon}>{lesson.icon}</div>

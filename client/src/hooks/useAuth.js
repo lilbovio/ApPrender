@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { loginUser, registerUser } from "../services/authService";
 
 export const useAuth = () => {
   const [user, setUser] = useState(null);
@@ -12,44 +13,33 @@ export const useAuth = () => {
 
   const login = async (email, password) => {
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-
+      const data = await loginUser(email, password);
       localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("token", data.token);
       setUser(data);
-      return true;
+      return data;
     } catch (error) {
       console.error(error);
-      return false;
+      throw error;
     }
   };
 
   const register = async (name, email, password) => {
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-
-      return true;
+      const data = await registerUser(name, email, password);
+      localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("token", data.token);
+      setUser(data);
+      return data;
     } catch (error) {
       console.error(error);
-      return false;
+      throw error;
     }
   };
 
   const logout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     setUser(null);
   };
 

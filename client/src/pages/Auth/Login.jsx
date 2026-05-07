@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 import styles from "./Login.module.css";
 import ChispappLogo from "../../assets/ChispappICON.png";
 
@@ -14,6 +15,8 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const { login } = useAuth();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -26,27 +29,15 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // MODO DEMO: Simular login exitoso sin backend
-      // En producción, esto llamaría a useAuth().login(email, password)
-      const mockUser = {
-        _id: "demo-user-123",
-        email: form.email,
-        name: form.email.split("@")[0],
-        grade: "4to",
-        vakType: null,
-        xp: 0,
-      };
+      const user = await login(form.email, form.password);
 
-      // Guardar en localStorage (simular JWT)
-      localStorage.setItem("token", "demo-token-xyz");
-      localStorage.setItem("user", JSON.stringify(mockUser));
-
-      // Pequeño delay para simular request
-      await new Promise((r) => setTimeout(r, 800));
-
-      navigate("/home");
+      if (user.vakType === null) {
+        navigate("/vak");
+      } else {
+        navigate("/home");
+      }
     } catch (err) {
-      setError("Error al iniciar sesión. Intenta de nuevo.");
+      setError(err.message || "Error al iniciar sesión. Intenta de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -117,10 +108,6 @@ const Login = () => {
             >
               {loading ? "Cargando..." : "Entrar"}
             </button>
-
-            <div className={styles.demoHint}>
-              <strong>MODO DEMO</strong> — Usa cualquier email y contraseña para explorar
-            </div>
           </form>
 
           {/* Footer */}

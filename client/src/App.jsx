@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import Login from "./pages/Auth/Login";
@@ -7,6 +7,8 @@ import Home from "./pages/Home/Home";
 import Learn from "./pages/Learn/Learn";
 import Profile from "./pages/Profile/Profile";
 import VAKTest from "./pages/VAKTest/VAKTest";
+import Navbar from "./components/navbar/Navbar";
+import Subjects from "./pages/Subjects/Subjects";
 
 /**
  * ProtectedRoute — Simula protección sin backend real
@@ -24,9 +26,10 @@ function ProtectedRoute({ element }) {
   return isAuthenticated ? element : <Navigate to="/" />;
 }
 
-function App() {
+// Un componente wrapper para usar useLocation
+function AppContent() {
   return (
-    <BrowserRouter>
+    <>
       <Routes>
         {/* Auth routes */}
         <Route path="/" element={<Login />} />
@@ -36,12 +39,22 @@ function App() {
         {/* Protected routes */}
         <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
         <Route path="/learn" element={<ProtectedRoute element={<Learn />} />} />
+        <Route path="/subjects" element={<ProtectedRoute element={<Subjects />} />} />
         <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
         <Route path="/vak" element={<ProtectedRoute element={<VAKTest />} />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+      <Navbar />
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }

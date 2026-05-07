@@ -1,0 +1,160 @@
+.learnContainer {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 20px;
+  padding-bottom: 100px;
+}
+
+.header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.title {
+  font-size: 28px;
+  color: var(--primary);
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.subjectSelector {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.subjectCard {
+  flex: 1;
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  border: 4px solid var(--border);
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.subjectCard.english {
+  border-color: rgba(124, 58, 237, 0.2);
+}
+.subjectCard.math {
+  border-color: rgba(236, 72, 153, 0.2);
+}
+
+.subjectCard.english.selected {
+  border-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(124, 58, 237, 0.2);
+}
+
+.subjectCard.math.selected {
+  border-color: var(--secondary);
+  background: rgba(236, 72, 153, 0.05);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(236, 72, 153, 0.2);
+}
+
+.subjectIcon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.subjectName {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.lessonsSection {
+  animation: fadeIn 0.5s ease;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lessonList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lessonCard {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--border);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.lessonCard:hover {
+  transform: translateX(4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.lessonIconWrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+
+.lessonInfo {
+  flex: 1;
+}
+
+.lessonTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 4px 0;
+}
+
+.lessonDesc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.playButton {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
