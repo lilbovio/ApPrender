@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chispapp - Home Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive;
+            background: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: #2a2a2a;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            border-radius: 12px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+        }
+
+        .nav-item:hover {
+            background: #3a3a3a;
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #1a1a1a;
+            font-weight: bold;
+        }
+
+        .weekly-goal {
+            margin-top: auto;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .weekly-goal h3 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .weekly-goal p {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .weekly-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .weekly-bar {
+            background: #e0e0e0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .weekly-bar-fill {
+            background: linear-gradient(90deg, #FF6B6B 0%, #FFA500 100%);
+            height: 100%;
+            width: 60%;
+            border-radius: 5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 240px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header */
+        .top-header {
+            background: #2a2a2a;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3a3a3a;
+        }
+
+        .app-title {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .level-progress {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .level-label {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .level-bar {
+            width: 120px;
+            height: 8px;
+            background: #3a3a3a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .level-bar-fill {
+            background: linear-gradient(90deg, #4FACFE 0%, #00F2FE 100%);
+            height: 100%;
+            width: 65%;
+            border-radius: 4px;
+        }
+
+        .notification-badges {
+            display: flex;
+            gap: 10px;
+        }
+
+        .badge-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .badge-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .badge-circle.yellow {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        }
+
+        .badge-circle.orange {
+            background: linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%);
+        }
+
+        .badge-circle.gray {
+            background: #3a3a3a;
+            color: #888;
+        }
+
+        .badge-number {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #FF6B6B;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 2px solid #2a2a2a;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            background: linear-gradient(180deg, #87CEEB 0%, #98D8C8 100%);
+            position: relative;
+            overflow-y: auto;
+        }
+
+        /* Decorative clouds */
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 100px;
+            opacity: 0.5;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .cloud1 { width: 100px; height: 40px; top: 50px; left: 10%; }
+        .cloud2 { width: 150px; height: 60px; top: 150px; right: 15%; animation-delay: -5s; }
+        .cloud3 { width: 120px; height: 50px; top: 400px; left: 70%; animation-delay: -10s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);
+            border-radius: 25px;
+            padding: 40px;
+            margin-bottom: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 5px solid white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content h1 {
+            font-size: 48px;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .hero-content p {
+            font-size: 20px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 25px;
+        }
+
+        .special-mission-btn {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #1a1a1a;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .special-mission-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 215, 0, 0.6);
+        }
+
+        .hero-avatar {
+            width: 150px;
+            height: 150px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            border: 5px solid white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Notification Card */
+        .notification-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 3px solid #E0E0E0;
+        }
+
+        .notification-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .notification-text {
+            flex: 1;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .notification-action {
+            color: #4FACFE;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Daily Mission Card */
+        .daily-mission {
+            background: linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%);
+            border-radius: 20px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 5px solid white;
+        }
+
+        .mission-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .mission-content {
+            flex: 1;
+        }
+
+        .mission-content h3 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mission-content p {
+            color: rgba(255,255,255,0.9);
+            font-size: 15px;
+        }
+
+        .accept-btn {
+            background: rgba(0,0,0,0.3);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .accept-btn:hover {
+            background: rgba(0,0,0,0.5);
+            transform: scale(1.05);
+        }
+
+        /* Subjects Section */
+        .section-title {
+            font-size: 28px;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .subject-card {
+            background: #2a2a2a;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 5px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .subject-card.math {
+            border-color: #4FACFE;
+        }
+
+        .subject-card.english {
+            border-color: #FFD700;
+        }
+
+        .subject-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .subject-icon-box {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .subject-info h3 {
+            color: white;
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .subject-percentage {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .subject-card.math .subject-percentage {
+            color: #4FACFE;
+        }
+
+        .subject-card.english .subject-percentage {
+            color: #FFD700;
+        }
+
+        .subject-progress-bar {
+            background: #3a3a3a;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .subject-progress-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+
+        .subject-card.math .subject-progress-fill {
+            background: linear-gradient(90deg, #4FACFE 0%, #00F2FE 100%);
+            width: 80%;
+        }
+
+        .subject-card.english .subject-progress-fill {
+            background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+            width: 45%;
+        }
+
+        .subject-details {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .learn-btn {
+            background: transparent;
+            color: #4FACFE;
+            border: 2px solid #4FACFE;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .learn-btn:hover {
+            background: #4FACFE;
+            color: white;
+        }
+
+        .subject-card.english .learn-btn {
+            color: #FFD700;
+            border-color: #FFD700;
+        }
+
+        .subject-card.english .learn-btn:hover {
+            background: #FFD700;
+            color: #1a1a1a;
+        }
+
+        /* Badges Section */
+        .badges-section {
+            margin-bottom: 30px;
+        }
+
+        .badges-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .view-all {
+            color: #4FACFE;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 20px;
+        }
+
+        .badge-item {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            border: 3px solid #FFD700;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .badge-item:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .badge-item.locked {
+            background: #E0E0E0;
+            border-color: #CCC;
+            opacity: 0.5;
+        }
+
+        .badge-emoji {
+            font-size: 56px;
+            margin-bottom: 10px;
+            display: block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .badge-item.locked .badge-emoji {
+            animation: none;
+        }
+
+        .badge-check {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #4FACFE;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+
+            .logo-text, .nav-item span, .weekly-goal {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+
+            .hero-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero-content h1 {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">Chispapp</div>
+        </div>
+
+        <div class="nav-item active">
+            <span>🏠</span>
+            <span>Inicio</span>
+        </div>
+        <div class="nav-item">
+            <span>📚</span>
+            <span>Materias</span>
+        </div>
+        <div class="nav-item">
+            <span>👤</span>
+            <span>Mi Héroe</span>
+        </div>
+        <div class="nav-item">
+            <span>🏆</span>
+            <span>Insignias</span>
+        </div>
+
+        <div class="weekly-goal">
+            <h3>🎯 Meta de la semana</h3>
+            <p>¡Completa 2 misiones más para abrir el cofre mágico!</p>
+            <div class="weekly-progress">
+                <span>PROGRESO</span>
+                <span>3/5</span>
+            </div>
+            <div class="weekly-bar">
+                <div class="weekly-bar-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <div class="app-title">Chispapp</div>
+            <div class="header-right">
+                <div class="level-progress">
+                    <span class="level-label">NIVEL</span>
+                    <div class="level-bar">
+                        <div class="level-bar-fill"></div>
+                    </div>
+                </div>
+                <div class="notification-badges">
+                    <div class="badge-circle yellow">
+                        😊
+                        <div class="badge-number">5</div>
+                    </div>
+                    <div class="badge-circle orange">
+                        🔔
+                        <div class="badge-number">2</div>
+                    </div>
+                    <div class="badge-circle gray">
+                        👤
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+
+            <div class="content-wrapper">
+                <!-- Hero Banner -->
+                <div class="hero-banner">
+                    <div class="hero-content">
+                        <h1>¡Hola, Lolo!</h1>
+                        <p>¿Listo para descubrir cosas asombrosas hoy?</p>
+                        <button class="special-mission-btn">
+                            🚀 Iniciar Misión Especial
+                        </button>
+                    </div>
+                    <div class="hero-avatar">🤖</div>
+                </div>
+
+                <!-- Notification Card -->
+                <div class="notification-card">
+                    <div class="notification-icon">💬</div>
+                    <div class="notification-text">
+                        ¡Hola de nuevo, Lolo! Hoy es un gran día para descubrir matemáticas galácticas o explorar el espacio. 🚀
+                    </div>
+                    <div class="notification-action">
+                        Saludar 👋
+                    </div>
+                </div>
+
+                <!-- Daily Mission -->
+                <div class="daily-mission">
+                    <div class="mission-icon">💻</div>
+                    <div class="mission-content">
+                        <h3>Misión del día 🎯</h3>
+                        <p>¿Listo para el desafío de hoy? ¡Repasa vocabulario y suma racha!</p>
+                    </div>
+                    <button class="accept-btn">ACEPTAR</button>
+                </div>
+
+                <!-- Subjects Section -->
+                <h2 class="section-title">Tus Materias</h2>
+                <div class="subjects-grid">
+                    <div class="subject-card math">
+                        <div class="subject-header">
+                            <div class="subject-icon-box">🔢</div>
+                            <div class="subject-info">
+                                <h3>Mundo Fracciones</h3>
+                                <div class="subject-percentage">80%</div>
+                            </div>
+                        </div>
+                        <div class="subject-progress-bar">
+                            <div class="subject-progress-fill"></div>
+                        </div>
+                        <div class="subject-details">Tema: Pizzas y proporciones</div>
+                        <button class="learn-btn">¡Aprender! →</button>
+                    </div>
+
+                    <div class="subject-card english">
+                        <div class="subject-header">
+                            <div class="subject-icon-box">🌍</div>
+                            <div class="subject-info">
+                                <h3>Inglés Elemental</h3>
+                                <div class="subject-percentage">45%</div>
+                            </div>
+                        </div>
+                        <div class="subject-progress-bar">
+                            <div class="subject-progress-fill"></div>
+                        </div>
+                        <div class="subject-details">Vocabulario estelar</div>
+                        <button class="learn-btn">Practicar →</button>
+                    </div>
+                </div>
+
+                <!-- Badges Section -->
+                <div class="badges-section">
+                    <div class="badges-header">
+                        <h2 class="section-title">Tus Insignias</h2>
+                        <div class="view-all">Ver catálogo completo</div>
+                    </div>
+                    <div class="badges-grid">
+                        <div class="badge-item">
+                            <div class="badge-check">✓</div>
+                            <span class="badge-emoji">🏆</span>
+                        </div>
+                        <div class="badge-item">
+                            <div class="badge-check">✓</div>
+                            <span class="badge-emoji">🌟</span>
+                        </div>
+                        <div class="badge-item locked">
+                            <span class="badge-emoji">❌</span>
+                        </div>
+                        <div class="badge-item locked">
+                            <span class="badge-emoji">❌</span>
+                        </div>
+                        <div class="badge-item locked">
+                            <span class="badge-emoji">❌</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
