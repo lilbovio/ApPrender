@@ -29,7 +29,7 @@ const PORT = process.env.PORT || 5000
 // CORS configuration for both local development and production
 const allowedOrigins = [
   /^http:\/\/localhost:\d+$/,  // Local development (any port)
-  'https://ap-prender-client.vercel.app',  // Production frontend
+  'https://ap-prender-client.vercel.app/',  // Production frontend
   /^https:\/\/ap-prender-client.*\.vercel\.app$/  // Vercel preview deployments
 ];
 
