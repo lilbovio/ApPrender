@@ -19,23 +19,23 @@ export default function ThemeToggle() {
       title={isDarkMode ? "Modo Claro" : "Modo Oscuro"}
       style={{
         position: "fixed",
-        top: 20,
-        right: 20,
-        width: 56,
-        height: 56,
+        top: 16,
+        right: 80,
+        width: 48,
+        height: 48,
         borderRadius: "50%",
         border: "none",
-        background: isDarkMode 
+        background: isDarkMode
           ? "linear-gradient(135deg, #2d3548 0%, #3d4560 100%)"
           : "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
         boxShadow: isDarkMode
-          ? "0 8px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)"
-          : "0 8px 24px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)",
+          ? "0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)"
+          : "0 4px 16px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)",
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 1000,
+        zIndex: 999,
         transition: "all 0.3s ease",
         transform: isHovered ? "scale(1.1) rotate(10deg)" : "scale(1) rotate(0deg)",
       }}
