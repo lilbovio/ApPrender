@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import Login from "./pages/Auth/Login";
@@ -8,7 +8,7 @@ import Learn from "./pages/Learn/Learn";
 import LessonView from "./pages/Learn/LessonView";
 import Profile from "./pages/Profile/Profile";
 import VAKTest from "./pages/VAKTest/VAKTest";
-import Navbar from "./components/navbar/Navbar";
+import ThemeToggle from "./components/common/ThemeToggle";
 import Subjects from "./pages/Subjects/Subjects";
 
 /**
@@ -48,7 +48,9 @@ function AppContent() {
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-      <Navbar />
+      
+      {/* Dark Mode Toggle - Fixed position top-right */}
+      <ThemeToggle />
     </>
   );
 }
