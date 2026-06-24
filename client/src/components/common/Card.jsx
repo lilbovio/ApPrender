@@ -13,9 +13,9 @@ import React from "react";
  */
 
 const CARD_BASE = {
-  background: "#ffffff",
+  background: "var(--card)",
   borderRadius: 24,
-  boxShadow: "0 4px 20px rgba(0,0,0,0.10)",
+  boxShadow: "var(--shadow-md)",
   position: "relative",
   overflow: "hidden",
   transition: "transform 0.18s, box-shadow 0.18s",
@@ -33,14 +33,14 @@ export default function Card({
   const [hovered, setHovered] = React.useState(false);
 
   const hoverStyles = hoverable && hovered
-    ? { transform: "translateY(-4px) scale(1.01)", boxShadow: "0 10px 32px rgba(0,0,0,0.16)" }
+    ? { transform: "translateY(-4px) scale(1.01)", boxShadow: "var(--shadow-lg)" }
     : {};
 
   const variantStyles = {
     default: {},
-    colored: { background: color || "#EFF6FF" },
-    lesson: { background: "#FEFEFE", borderLeft: `6px solid ${color || "#4D96FF"}` },
-    flat: { boxShadow: "none", border: "2px solid #eee" },
+    colored: { background: color || "var(--bg-secondary)" },
+    lesson: { background: "var(--card)", borderLeft: `6px solid ${color || "var(--primary)"}` },
+    flat: { boxShadow: "none", border: "2px solid var(--border)" },
   };
 
   return (

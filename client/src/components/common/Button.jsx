@@ -15,11 +15,11 @@ import React from "react";
  */
 
 const VARIANTS = {
-  primary:   { bg: "#4D96FF", hover: "#2979e8", text: "#fff", shadow: "0 6px 0 #1a5bbf" },
-  secondary: { bg: "#FFD93D", hover: "#f5c800", text: "#4a3000", shadow: "0 6px 0 #c8a000" },
-  danger:    { bg: "#FF6B6B", hover: "#e84444", text: "#fff", shadow: "0 6px 0 #b52020" },
-  ghost:     { bg: "transparent", hover: "#f0f4ff", text: "#4D96FF", shadow: "none" },
-  success:   { bg: "#6BCB77", hover: "#45b554", text: "#fff", shadow: "0 6px 0 #2e8c3e" },
+  primary:   { bg: "var(--primary)", hover: "var(--primary-dark)", text: "#fff", shadow: "0 6px 0 var(--primary-dark)" },
+  secondary: { bg: "var(--secondary)", hover: "#f5c800", text: "#fff", shadow: "0 6px 0 #c8a000" },
+  danger:    { bg: "var(--error)", hover: "#e84444", text: "#fff", shadow: "0 6px 0 #b52020" },
+  ghost:     { bg: "transparent", hover: "var(--hover)", text: "var(--primary)", shadow: "none" },
+  success:   { bg: "var(--success)", hover: "#45b554", text: "#fff", shadow: "0 6px 0 #2e8c3e" },
 };
 
 const SIZES = {
