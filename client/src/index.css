@@ -25,6 +25,7 @@
   --bg: #f8fafc;                /* Fondo principal - azul muy claro */
   --bg-secondary: #f1f5f9;      /* Fondo secundario */
   --card: #ffffff;              /* Fondo tarjetas */
+  --card-hover: #f8fafc;        /* Card hover */
   --hover: #f0f9ff;             /* Hover estado */
   
   /* Textos */
@@ -63,6 +64,51 @@
   --transition-slow: all 0.6s ease;
 }
 
+/* Dark Mode - Cozy & Child-Friendly */
+[data-theme="dark"] {
+  /* Colores Primarios - Más brillantes para visibilidad */
+  --primary: #9d6fff;           /* Púrpura más claro */
+  --primary-light: #b794ff;     /* Púrpura muy claro */
+  --primary-dark: #8b5cf6;      /* Púrpura medio */
+  
+  /* Colores Secundarios - Vibrantes */
+  --secondary: #ff5eb8;         /* Rosa más brillante */
+  --accent: #22d3ee;            /* Cyan brillante */
+  --accent-light: #67e8f9;      /* Cyan muy claro */
+  
+  /* Colores de Soporte - Brillantes */
+  --success: #34d399;           /* Verde brillante */
+  --warning: #fbbf24;           /* Ámbar brillante */
+  --error: #f87171;             /* Rojo brillante */
+  --info: #60a5fa;              /* Azul brillante */
+  
+  /* Colores por Materia - Ajustados */
+  --english: #9d6fff;           /* Inglés - Púrpura claro */
+  --math: #ff5eb8;              /* Matemáticas - Rosa brillante */
+  
+  /* Fondos - Cozy navy blues */
+  --bg: #1a1f35;                /* Fondo principal - navy profundo */
+  --bg-secondary: #242b45;      /* Fondo secundario - navy medio */
+  --card: #2d3548;              /* Tarjetas - gris-azul cálido */
+  --card-hover: #353d56;        /* Card hover - más claro */
+  --hover: #353d56;             /* Hover estado */
+  
+  /* Textos - Suaves, no harsh */
+  --text: #e8eaf0;              /* Texto principal - blanco suave */
+  --text-secondary: #b8bcc8;    /* Texto secundario - gris claro */
+  --text-muted: #8a8f9f;        /* Texto deshabilitado - gris medio */
+  
+  /* Bordes - Sutiles */
+  --border: #3d4560;            /* Borde estándar */
+  --border-light: #353d56;      /* Borde claro */
+  
+  /* Sombras - Más profundas con glow sutil */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+}
+
 /* Reset Global */
 * {
   margin: 0;
@@ -83,6 +129,24 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Smooth transitions for theme switching */
+*,
+*::before,
+*::after {
+  transition: background-color 0.3s ease,
+              color 0.3s ease,
+              border-color 0.3s ease,
+              box-shadow 0.3s ease,
+              fill 0.3s ease,
+              stroke 0.3s ease;
+}
+
+/* Exclude transform and position from transitions */
+* {
+  transition-property: background-color, color, border-color, box-shadow, fill, stroke;
 }
 
 /* Links */
