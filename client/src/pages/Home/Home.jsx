@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Home.module.css";
-
+import Layout from "../../components/layout/Layout";
 import { apiRequest } from "../../services/api";
 
 /**
@@ -83,9 +83,10 @@ const calculateEarnedBadges = (totalCompleted, mathCompleted, englishCompleted, 
  */
 const Home = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [mathLessons, setMathLessons] = useState([]);
-  const [englishLessons, setEnglishLessons] = useState([]);
+  const [user] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [mathProgress, setMathProgress] = useState({ completed: 0, total: 0, percentage: 0 });
   const [englishProgress, setEnglishProgress] = useState({ completed: 0, total: 0, percentage: 0 });
   const [stats, setStats] = useState({ xp: 0, streak: 0, level: 1, badges: 0 });
@@ -93,9 +94,6 @@ const Home = () => {
   const [earnedBadges, setEarnedBadges] = useState([]);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) setUser(JSON.parse(savedUser));
-
     const fetchHomeData = async () => {
       try {
         // Fetch both math and english lessons and progress
@@ -108,15 +106,8 @@ const Home = () => {
 
         // Process Math
         const mathCompletedIds = mathProgressData.completedLessons?.map(l => typeof l === 'object' ? l._id : l) || [];
-        const mathWithStatus = mathLessonsData.map(lesson => ({
-          ...lesson,
-          completed: mathCompletedIds.includes(lesson._id),
-          progress: mathCompletedIds.includes(lesson._id) ? 100 : 0
-        }));
-        setMathLessons(mathWithStatus);
-        
-        const mathCompleted = mathWithStatus.filter(l => l.completed).length;
-        const mathTotal = mathWithStatus.length;
+        const mathCompleted = mathLessonsData.filter(lesson => mathCompletedIds.includes(lesson._id)).length;
+        const mathTotal = mathLessonsData.length;
         setMathProgress({
           completed: mathCompleted,
           total: mathTotal,
@@ -125,15 +116,8 @@ const Home = () => {
 
         // Process English
         const englishCompletedIds = englishProgressData.completedLessons?.map(l => typeof l === 'object' ? l._id : l) || [];
-        const englishWithStatus = englishLessonsData.map(lesson => ({
-          ...lesson,
-          completed: englishCompletedIds.includes(lesson._id),
-          progress: englishCompletedIds.includes(lesson._id) ? 100 : 0
-        }));
-        setEnglishLessons(englishWithStatus);
-        
-        const englishCompleted = englishWithStatus.filter(l => l.completed).length;
-        const englishTotal = englishWithStatus.length;
+        const englishCompleted = englishLessonsData.filter(lesson => englishCompletedIds.includes(lesson._id)).length;
+        const englishTotal = englishLessonsData.length;
         setEnglishProgress({
           completed: englishCompleted,
           total: englishTotal,
@@ -157,7 +141,11 @@ const Home = () => {
           level: currentLevel,
           badges: badges.length,
           totalLessons,
-          totalCompleted
+          totalCompleted,
+          level: Math.floor(totalXP / 200) + 1, // Simple level calculation
+          badges: Math.floor(totalCompleted / 5), // 1 badge per 5 lessons
+          mathCompleted,
+          englishCompleted
         });
         
         setEarnedBadges(badges);
@@ -191,20 +179,21 @@ const Home = () => {
 
   if (loading) {
     return (
-      <div className={styles.homeContainer}>
+      <Layout user={user} stats={stats}>
         <div className={styles.loading}>Cargando...</div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className={styles.homeContainer}>
-      {/* Decorative Clouds */}
-      <div className={styles.cloud1}></div>
-      <div className={styles.cloud2}></div>
-      <div className={styles.cloud3}></div>
+    <Layout user={user} stats={stats}>
+      <div className={styles.homeContainer}>
+        {/* Decorative Clouds */}
+        <div className={styles.cloud1}></div>
+        <div className={styles.cloud2}></div>
+        <div className={styles.cloud3}></div>
 
-      <div className={styles.contentWrapper}>
+        <div className={styles.contentWrapper}>
         {/* Hero Banner */}
         <div className={styles.heroBanner}>
           <div className={styles.heroContent}>
@@ -369,6 +358,7 @@ const Home = () => {
         </div>
       </div>
     </div>
+    </Layout>
   );
 };
 
