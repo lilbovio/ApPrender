@@ -39,6 +39,11 @@ const Register = () => {
 
   return (
     <div className={styles.loginContainer}>
+      {/* Decorative Clouds */}
+      <div className={styles.cloud1}></div>
+      <div className={styles.cloud2}></div>
+      <div className={styles.cloud3}></div>
+
       <div className={styles.wrapper}>
         <div className={styles.card}>
           <div className={styles.header}>
@@ -87,16 +92,7 @@ const Register = () => {
             </div>
 
             {error && (
-              <div
-                style={{
-                  padding: "10px 12px",
-                  background: "rgba(239, 68, 68, 0.1)",
-                  border: "1px solid rgba(239, 68, 68, 0.3)",
-                  borderRadius: "var(--radius-md)",
-                  fontSize: "14px",
-                  color: "var(--error)",
-                }}
-              >
+              <div className={styles.errorMessage}>
                 {error}
               </div>
             )}
@@ -105,10 +101,6 @@ const Register = () => {
               className={styles.submitButton}
               type="submit"
               disabled={loading}
-              style={{
-                opacity: loading ? 0.7 : 1,
-                cursor: loading ? "not-allowed" : "pointer",
-              }}
             >
               {loading ? "Cargando..." : "Registrarse"}
             </button>

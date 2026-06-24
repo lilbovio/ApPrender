@@ -18,10 +18,24 @@ export const apiRequest = async (endpoint, method = "GET", body = null) => {
       body: body ? JSON.stringify(body) : null,
     });
 
-    const data = await res.json();
+    // Check if response has content before parsing
+    const contentType = res.headers.get("content-type");
+    let data = null;
+    
+    if (contentType && contentType.includes("application/json")) {
+      const text = await res.text();
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch (parseError) {
+          console.error("JSON Parse Error:", parseError);
+          throw new Error("Invalid JSON response from server");
+        }
+      }
+    }
 
     if (!res.ok) {
-      throw new Error(data.message || "Error en la petición");
+      throw new Error(data?.message || `Error ${res.status}: ${res.statusText}`);
     }
 
     return data;
