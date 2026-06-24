@@ -17,7 +17,7 @@ export default function BadgeGrid({ badges = [], columns = 3 }) {
           textAlign: "center",
           padding: "40px 20px",
           fontFamily: "'Nunito', sans-serif",
-          color: "#94a3b8",
+          color: "var(--text-muted)",
           fontWeight: 600,
           fontSize: 16,
         }}
@@ -41,18 +41,18 @@ export default function BadgeGrid({ badges = [], columns = 3 }) {
           marginBottom: 16,
         }}
       >
-        <span style={{ fontWeight: 700, fontSize: 15, color: "#64748b" }}>
+        <span style={{ fontWeight: 700, fontSize: 15, color: "var(--text-secondary)" }}>
           Tus logros
         </span>
         <span
           style={{
-            background: "#FFF9E6",
-            color: "#92400e",
+            background: "var(--warning)",
+            color: "#fff",
             fontWeight: 800,
             fontSize: 13,
             borderRadius: 10,
             padding: "3px 10px",
-            border: "1.5px solid #FFD93D",
+            border: "1.5px solid var(--warning)",
           }}
         >
           ⭐ {earned}/{badges.length}
@@ -97,10 +97,10 @@ function BadgeItem({ badge, showTooltip, onToggleTooltip }) {
           width: "100%",
           aspectRatio: "1",
           borderRadius: 20,
-          border: badge.earned ? "3px solid #FFD93D" : "2.5px solid #e2e8f0",
+          border: badge.earned ? "3px solid var(--warning)" : "2.5px solid var(--border)",
           background: badge.earned
             ? "linear-gradient(135deg, #FFF9E6 0%, #FFF3CD 100%)"
-            : "#f8fafc",
+            : "var(--bg-secondary)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -123,7 +123,7 @@ function BadgeItem({ badge, showTooltip, onToggleTooltip }) {
         style={{
           fontWeight: 700,
           fontSize: 11,
-          color: badge.earned ? "#1e293b" : "#94a3b8",
+          color: badge.earned ? "var(--text)" : "var(--text-muted)",
           textAlign: "center",
           lineHeight: 1.2,
         }}
@@ -139,15 +139,15 @@ function BadgeItem({ badge, showTooltip, onToggleTooltip }) {
             bottom: "calc(100% + 10px)",
             left: "50%",
             transform: "translateX(-50%)",
-            background: "#1e293b",
-            color: "#fff",
+            background: "var(--text)",
+            color: "var(--card)",
             borderRadius: 12,
             padding: "8px 12px",
             fontSize: 12,
             fontWeight: 600,
             whiteSpace: "nowrap",
             zIndex: 10,
-            boxShadow: "0 4px 16px rgba(0,0,0,0.22)",
+            boxShadow: "var(--shadow-lg)",
             maxWidth: 180,
             whiteSpace: "normal",
             textAlign: "center",
@@ -175,7 +175,7 @@ function BadgeItem({ badge, showTooltip, onToggleTooltip }) {
               transform: "translateX(-50%)",
               width: 12,
               height: 6,
-              background: "#1e293b",
+              background: "var(--text)",
               clipPath: "polygon(0 0, 100% 0, 50% 100%)",
             }}
           />

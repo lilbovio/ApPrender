@@ -10,12 +10,17 @@
   font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive;
 }
 
+/* Dark mode background */
+[data-theme="dark"] .homeContainer {
+  background: linear-gradient(180deg, #1a1f35 0%, #242b45 100%);
+}
+
 /* Loading State */
 .loading {
   text-align: center;
   padding: 40px;
   font-size: 18px;
-  color: #333;
+  color: var(--text);
 }
 
 /* Decorative Clouds */
@@ -28,6 +33,13 @@
   opacity: 0.5;
   animation: float 20s infinite ease-in-out;
   pointer-events: none;
+}
+
+/* Clouds in dark mode - more subtle */
+[data-theme="dark"] .cloud1,
+[data-theme="dark"] .cloud2,
+[data-theme="dark"] .cloud3 {
+  opacity: 0.15;
 }
 
 .cloud1 {
@@ -84,6 +96,12 @@
   overflow: hidden;
 }
 
+[data-theme="dark"] .heroBanner {
+  background: linear-gradient(135deg, #353d56 0%, #2d3548 100%);
+  border-color: var(--border);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+}
+
 .heroBanner::before {
   content: '';
   position: absolute;
@@ -93,6 +111,10 @@
   height: 300px;
   background: rgba(255,255,255,0.1);
   border-radius: 50%;
+}
+
+[data-theme="dark"] .heroBanner::before {
+  background: rgba(157, 111, 255, 0.1);
 }
 
 .heroContent {
@@ -161,12 +183,12 @@
 
 /* Level Card */
 .levelCard {
-  background: white;
+  background: var(--card);
   border-radius: 20px;
   padding: 20px 25px;
   margin-bottom: 25px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-  border: 3px solid #FFD700;
+  box-shadow: var(--shadow-lg);
+  border: 3px solid var(--warning);
 }
 
 .levelHeader {
@@ -185,12 +207,12 @@
 .levelLabel {
   font-size: 20px;
   font-weight: bold;
-  color: #333;
+  color: var(--text);
 }
 
 .xpText {
   font-size: 16px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .streakBadge {
@@ -204,11 +226,15 @@
 }
 
 .levelBarContainer {
-  background: #E0E0E0;
+  background: var(--bg-secondary);
   height: 30px;
   border-radius: 15px;
   overflow: hidden;
   position: relative;
+}
+
+[data-theme="dark"] .levelBarContainer {
+  background: var(--border);
 }
 
 .levelBarFill {
@@ -222,6 +248,11 @@
   color: #333;
   transition: width 0.5s ease;
   animation: pulse 2s infinite;
+}
+
+[data-theme="dark"] .levelBarFill {
+  background: linear-gradient(90deg, var(--warning) 0%, #FFA500 100%);
+  color: #1a1a1a;
 }
 
 @keyframes pulse {
@@ -240,15 +271,15 @@
 
 /* Notification Card */
 .notificationCard {
-  background: white;
+  background: var(--card);
   border-radius: 20px;
   padding: 20px 25px;
   margin-bottom: 25px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-lg);
   display: flex;
   align-items: center;
   gap: 20px;
-  border: 3px solid #E0E0E0;
+  border: 3px solid var(--border);
 }
 
 .notificationIcon {
@@ -263,14 +294,18 @@
   flex-shrink: 0;
 }
 
+[data-theme="dark"] .notificationIcon {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+}
+
 .notificationText {
   flex: 1;
-  color: #333;
+  color: var(--text);
   font-size: 15px;
 }
 
 .notificationAction {
-  color: #4FACFE;
+  color: var(--primary);
   font-weight: bold;
   cursor: pointer;
   display: flex;
@@ -348,7 +383,7 @@
 /* Section Title */
 .sectionTitle {
   font-size: 28px;
-  color: #1a1a1a;
+  color: var(--text);
   margin-bottom: 20px;
   font-weight: bold;
 }
@@ -362,10 +397,10 @@
 }
 
 .subjectCard {
-  background: #2a2a2a;
+  background: var(--card);
   border-radius: 20px;
   padding: 25px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  box-shadow: var(--shadow-lg);
   border: 5px solid transparent;
   transition: all 0.3s ease;
   cursor: pointer;
@@ -373,15 +408,23 @@
 
 .subjectCard:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+  box-shadow: var(--shadow-xl);
 }
 
 .subjectCard.math {
   border-color: #4FACFE;
 }
 
+[data-theme="dark"] .subjectCard.math {
+  border-color: var(--primary);
+}
+
 .subjectCard.english {
   border-color: #FFD700;
+}
+
+[data-theme="dark"] .subjectCard.english {
+  border-color: var(--warning);
 }
 
 .subjectHeader {
@@ -394,7 +437,7 @@
 .subjectIconBox {
   width: 60px;
   height: 60px;
-  background: white;
+  background: var(--bg);
   border-radius: 15px;
   display: flex;
   align-items: center;
@@ -407,7 +450,7 @@
 }
 
 .subjectInfo h3 {
-  color: white;
+  color: var(--text);
   font-size: 22px;
   margin-bottom: 5px;
 }
@@ -421,16 +464,28 @@
   color: #4FACFE;
 }
 
+[data-theme="dark"] .subjectCard.math .subjectPercentage {
+  color: var(--primary);
+}
+
 .subjectCard.english .subjectPercentage {
   color: #FFD700;
 }
 
+[data-theme="dark"] .subjectCard.english .subjectPercentage {
+  color: var(--warning);
+}
+
 .subjectProgressBar {
-  background: #3a3a3a;
+  background: var(--bg-secondary);
   height: 12px;
   border-radius: 6px;
   overflow: hidden;
   margin-bottom: 15px;
+}
+
+[data-theme="dark"] .subjectProgressBar {
+  background: var(--border);
 }
 
 .subjectProgressFill {
@@ -443,12 +498,20 @@
   background: linear-gradient(90deg, #4FACFE 0%, #00F2FE 100%);
 }
 
+[data-theme="dark"] .subjectCard.math .subjectProgressFill {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+}
+
 .subjectCard.english .subjectProgressFill {
   background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
 }
 
+[data-theme="dark"] .subjectCard.english .subjectProgressFill {
+  background: linear-gradient(90deg, var(--warning) 0%, #FFA500 100%);
+}
+
 .subjectDetails {
-  color: #888;
+  color: var(--text-secondary);
   font-size: 13px;
   margin-bottom: 15px;
 }
@@ -474,6 +537,16 @@
   color: white;
 }
 
+[data-theme="dark"] .learnBtn {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .learnBtn:hover {
+  background: var(--primary);
+  color: white;
+}
+
 .subjectCard.english .learnBtn {
   color: #FFD700;
   border-color: #FFD700;
@@ -481,6 +554,16 @@
 
 .subjectCard.english .learnBtn:hover {
   background: #FFD700;
+  color: #1a1a1a;
+}
+
+[data-theme="dark"] .subjectCard.english .learnBtn {
+  color: var(--warning);
+  border-color: var(--warning);
+}
+
+[data-theme="dark"] .subjectCard.english .learnBtn:hover {
+  background: var(--warning);
   color: #1a1a1a;
 }
 
@@ -497,7 +580,7 @@
 }
 
 .viewAll {
-  color: #4FACFE;
+  color: var(--primary);
   font-size: 14px;
   cursor: pointer;
   font-weight: bold;
@@ -515,12 +598,12 @@
 }
 
 .badgeItem {
-  background: white;
+  background: var(--card);
   border-radius: 15px;
   padding: 20px;
   text-align: center;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-  border: 3px solid #FFD700;
+  box-shadow: var(--shadow-md);
+  border: 3px solid var(--warning);
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
@@ -532,8 +615,8 @@
 }
 
 .badgeItem.locked {
-  background: #E0E0E0;
-  border-color: #CCC;
+  background: var(--bg-secondary);
+  border-color: var(--border);
   opacity: 0.5;
 }
 
@@ -574,16 +657,16 @@
 
 /* Weekly Goal Widget */
 .weeklyGoal {
-  background: white;
+  background: var(--card);
   border-radius: 20px;
   padding: 25px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-  border: 3px solid #FFD700;
+  box-shadow: var(--shadow-lg);
+  border: 3px solid var(--warning);
 }
 
 .weeklyGoal h3 {
   font-size: 18px;
-  color: #333;
+  color: var(--text);
   margin-bottom: 10px;
   display: flex;
   align-items: center;
@@ -592,7 +675,7 @@
 
 .weeklyGoal p {
   font-size: 14px;
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 15px;
 }
 
@@ -602,15 +685,19 @@
   align-items: center;
   margin-bottom: 10px;
   font-size: 12px;
-  color: #666;
+  color: var(--text-secondary);
   font-weight: bold;
 }
 
 .weeklyBar {
-  background: #E0E0E0;
+  background: var(--bg-secondary);
   height: 12px;
   border-radius: 6px;
   overflow: hidden;
+}
+
+[data-theme="dark"] .weeklyBar {
+  background: var(--border);
 }
 
 .weeklyBarFill {
@@ -618,6 +705,10 @@
   height: 100%;
   border-radius: 6px;
   transition: width 0.5s ease;
+}
+
+[data-theme="dark"] .weeklyBarFill {
+  background: linear-gradient(90deg, var(--error) 0%, var(--warning) 100%);
 }
 
 /* Responsive Design */

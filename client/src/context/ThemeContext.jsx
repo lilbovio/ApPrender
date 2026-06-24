@@ -2,8 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 /**
  * ThemeContext
- * Maneja el tema de la app (colores por materia/VAK, modo claro).
- * Los temas son siempre claros y vibrantes — apropiados para niños.
+ * Maneja el tema de la app (colores por materia/VAK + modo claro/oscuro).
+ * Ahora incluye soporte para dark mode cozy y child-friendly.
  */
 
 const ThemeContext = createContext(null);
@@ -86,12 +86,38 @@ function applyCSSVariables(theme) {
 
 export function ThemeProvider({ children }) {
   const [themeName, setThemeName] = useState("default");
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const theme = THEMES[themeName] || THEMES.default;
 
+  // Load dark mode preference from localStorage on mount
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem("darkMode");
+    if (savedDarkMode !== null) {
+      setIsDarkMode(savedDarkMode === "true");
+    }
+  }, []);
+
+  // Apply theme and dark mode
   useEffect(() => {
     applyCSSVariables(theme);
     document.body.style.background = theme.bg;
-  }, [theme]);
+    
+    // Apply dark mode to document
+    if (isDarkMode) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
+  }, [theme, isDarkMode]);
+
+  // Toggle dark mode
+  const toggleDarkMode = () => {
+    setIsDarkMode((prev) => {
+      const newValue = !prev;
+      localStorage.setItem("darkMode", String(newValue));
+      return newValue;
+    });
+  };
 
   // Cambiar tema (ej. cuando el niño elige materia)
   const setTheme = (name) => {
@@ -102,7 +128,17 @@ export function ThemeProvider({ children }) {
   const resetTheme = () => setThemeName("default");
 
   return (
-    <ThemeContext.Provider value={{ theme, themeName, setTheme, resetTheme, THEMES }}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        themeName,
+        isDarkMode,
+        setTheme,
+        toggleDarkMode,
+        resetTheme,
+        THEMES
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

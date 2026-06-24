@@ -9,6 +9,7 @@ import Profile from "./pages/Profile/Profile";
 import VAKTest from "./pages/VAKTest/VAKTest";
 import Navbar from "./components/navbar/Navbar";
 import Subjects from "./pages/Subjects/Subjects";
+import ThemeToggle from "./components/common/ThemeToggle";
 
 /**
  * ProtectedRoute — Simula protección sin backend real
@@ -28,6 +29,9 @@ function ProtectedRoute({ element }) {
 
 // Un componente wrapper para usar useLocation
 function AppContent() {
+  const location = useLocation();
+  const isAuthPage = ["/", "/login", "/register"].includes(location.pathname);
+
   return (
     <>
       <Routes>
@@ -47,6 +51,8 @@ function AppContent() {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       <Navbar />
+      {/* Show theme toggle on all pages */}
+      <ThemeToggle />
     </>
   );
 }
