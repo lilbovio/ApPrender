@@ -26,11 +26,37 @@ const PORT = process.env.PORT || 5000
 
 // ─── Middleware ────────────────────────────────────────────────────────────────
 
+// CORS configuration for both local development and production
+const allowedOrigins = [
+  /^http:\/\/localhost:\d+$/,  // Local development (any port)
+  'https://ap-prender-client.vercel.app',  // Production frontend
+  /^https:\/\/ap-prender-client.*\.vercel\.app$/  // Vercel preview deployments
+];
+
 app.use(cors({
-  origin: /^http:\/\/localhost:\d+$/,  // Permite cualquier puerto en localhost
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin matches any allowed pattern
+    const isAllowed = allowedOrigins.some(allowedOrigin => {
+      if (allowedOrigin instanceof RegExp) {
+        return allowedOrigin.test(origin);
+      }
+      return allowedOrigin === origin;
+    });
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 600 // Cache preflight requests for 10 minutes
 }))
 
 app.use(express.json({ limit: '10mb' }))
