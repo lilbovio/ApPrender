@@ -5,6 +5,7 @@ import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import Home from "./pages/Home/Home";
 import Learn from "./pages/Learn/Learn";
+import LessonView from "./pages/Learn/LessonView";
 import Profile from "./pages/Profile/Profile";
 import VAKTest from "./pages/VAKTest/VAKTest";
 import Navbar from "./components/navbar/Navbar";
@@ -39,6 +40,7 @@ function AppContent() {
         {/* Protected routes */}
         <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
         <Route path="/learn" element={<ProtectedRoute element={<Learn />} />} />
+        <Route path="/learn/lesson/:lessonId" element={<ProtectedRoute element={<LessonView />} />} />
         <Route path="/subjects" element={<ProtectedRoute element={<Subjects />} />} />
         <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
         <Route path="/vak" element={<ProtectedRoute element={<VAKTest />} />} />

@@ -572,6 +572,19 @@
   font-size: 14px;
 }
 
+.badgeName {
+  font-size: 11px;
+  color: #333;
+  font-weight: 600;
+  margin-top: 5px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.badgeItem.locked .badgeName {
+  color: #999;
+}
+
 /* Weekly Goal Widget */
 .weeklyGoal {
   background: white;

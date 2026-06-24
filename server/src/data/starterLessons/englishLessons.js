@@ -1,7 +1,7 @@
-// Grade 1 English Lessons - 5 Starter Lessons
+// 5 Starter English Lessons for Chispapp
 // Each lesson includes VAK-adapted content
 
-export const grade1EnglishLessons = [
+export const englishStarterLessons = [
   {
     title: "👋 Saludos y Presentaciones",
     description: "Aprende a saludar y presentarte en inglés",

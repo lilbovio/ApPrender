@@ -1,7 +1,7 @@
-// Grade 1 Math Lessons - 5 Starter Lessons
+// 5 Starter Math Lessons for Chispapp
 // Each lesson includes VAK-adapted content
 
-export const grade1MathLessons = [
+export const mathStarterLessons = [
   {
     title: "🔢 Suma Básica",
     description: "Aprende a sumar números del 1 al 10 de forma divertida",
@@ -352,7 +352,7 @@ export const grade1MathLessons = [
     title: "⏰ Introducción al Tiempo",
     description: "Aprende a leer el reloj y entender las horas",
     subject: "math",
-    grade: "1",
+    grade: "2",
     icon: "⏰",
     xp: 50,
     vakType: "all",

@@ -5,6 +5,80 @@ import styles from "./Home.module.css";
 import { apiRequest } from "../../services/api";
 
 /**
+ * Badge definitions matching server-side
+ */
+const ACHIEVEMENT_BADGES = [
+  {
+    id: 1,
+    name: "Primera Victoria",
+    description: "¡Has completado tu primera lección!",
+    icon: "🌟",
+    criteria: { type: "lessons_completed", value: 1 }
+  },
+  {
+    id: 2,
+    name: "Racha Ardiente",
+    description: "¡3 días seguidos aprendiendo!",
+    icon: "🔥",
+    criteria: { type: "streak", value: 3 }
+  },
+  {
+    id: 3,
+    name: "Maestro Matemático",
+    description: "¡Dominaste todas las lecciones de matemáticas!",
+    icon: "🎯",
+    criteria: { type: "subject_completed", value: 5, subject: "math" }
+  },
+  {
+    id: 4,
+    name: "Explorador de Inglés",
+    description: "¡Completaste todas las lecciones de inglés!",
+    icon: "🌍",
+    criteria: { type: "subject_completed", value: 5, subject: "english" }
+  },
+  {
+    id: 5,
+    name: "Súper Estudiante",
+    description: "¡Completaste TODAS las lecciones!",
+    icon: "🏆",
+    criteria: { type: "all_lessons_completed", value: 10 }
+  }
+];
+
+/**
+ * Calculate which badges the user has earned
+ */
+const calculateEarnedBadges = (totalCompleted, mathCompleted, englishCompleted, mathStreak, englishStreak) => {
+  const maxStreak = Math.max(mathStreak, englishStreak);
+  
+  return ACHIEVEMENT_BADGES.filter(badge => {
+    const { criteria } = badge;
+    
+    switch (criteria.type) {
+      case "lessons_completed":
+        return totalCompleted >= criteria.value;
+      
+      case "streak":
+        return maxStreak >= criteria.value;
+      
+      case "subject_completed":
+        if (criteria.subject === "math") {
+          return mathCompleted >= criteria.value;
+        } else if (criteria.subject === "english") {
+          return englishCompleted >= criteria.value;
+        }
+        return false;
+      
+      case "all_lessons_completed":
+        return totalCompleted >= criteria.value;
+      
+      default:
+        return false;
+    }
+  });
+};
+
+/**
  * Home — Dashboard principal con diseño gamificado
  */
 const Home = () => {
@@ -16,6 +90,7 @@ const Home = () => {
   const [englishProgress, setEnglishProgress] = useState({ completed: 0, total: 0, percentage: 0 });
   const [stats, setStats] = useState({ xp: 0, streak: 0, level: 1, badges: 0 });
   const [loading, setLoading] = useState(true);
+  const [earnedBadges, setEarnedBadges] = useState([]);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
@@ -68,13 +143,24 @@ const Home = () => {
         // Calculate combined stats
         const totalXP = (mathProgressData.xp || 0) + (englishProgressData.xp || 0);
         const totalCompleted = mathCompleted + englishCompleted;
+        const totalLessons = 10; // 5 Math + 5 English
+        
+        // NEW: Level based on lesson completion (1 level per 2 lessons)
+        const currentLevel = Math.floor(totalCompleted / 2) + 1; // Levels 1-6
+        
+        // Calculate badges earned
+        const badges = calculateEarnedBadges(totalCompleted, mathCompleted, englishCompleted, mathProgressData.streak, englishProgressData.streak);
         
         setStats({
           xp: totalXP,
           streak: Math.max(mathProgressData.streak || 0, englishProgressData.streak || 0),
-          level: Math.floor(totalXP / 200) + 1, // Simple level calculation
-          badges: Math.floor(totalCompleted / 5) // 1 badge per 5 lessons
+          level: currentLevel,
+          badges: badges.length,
+          totalLessons,
+          totalCompleted
         });
+        
+        setEarnedBadges(badges);
       } catch (error) {
         console.error("Error fetching home data:", error);
       } finally {
@@ -96,7 +182,12 @@ const Home = () => {
     return "¡Buenas noches";
   };
 
-  const levelProgress = (stats.xp % 200) / 200 * 100; // Progress to next level
+  // NEW: Level progress based on lessons completed (not XP)
+  const totalLessons = 10; // 5 Math + 5 English
+  const totalCompleted = mathProgress.completed + englishProgress.completed;
+  const lessonsInCurrentLevel = totalCompleted % 2; // 2 lessons per level
+  const levelProgress = (lessonsInCurrentLevel / 2) * 100; // Progress to next level (0-100%)
+  const nextLevelAt = (Math.floor(totalCompleted / 2) + 1) * 2; // Next level milestone
 
   if (loading) {
     return (
@@ -140,7 +231,9 @@ const Home = () => {
           <div className={styles.levelHeader}>
             <div className={styles.levelInfo}>
               <span className={styles.levelLabel}>Nivel {stats.level}</span>
-              <span className={styles.xpText}>{stats.xp} XP</span>
+              <span className={styles.xpText}>
+                {totalCompleted} / {totalLessons} lecciones
+              </span>
             </div>
             <div className={styles.streakBadge}>
               🔥 {stats.streak} días
@@ -152,20 +245,11 @@ const Home = () => {
               style={{ width: `${levelProgress}%` }}
             >
               <span className={styles.levelBarText}>
-                {Math.round(levelProgress)}%
+                {totalCompleted < totalLessons
+                  ? `${nextLevelAt - totalCompleted} lecciones para nivel ${stats.level + 1}`
+                  : "¡Nivel máximo!"}
               </span>
             </div>
-          </div>
-        </div>
-
-        {/* Notification Card */}
-        <div className={styles.notificationCard}>
-          <div className={styles.notificationIcon}>💬</div>
-          <div className={styles.notificationText}>
-            ¡Hola de nuevo! Hoy es un gran día para descubrir matemáticas galácticas o explorar el espacio. 🚀
-          </div>
-          <div className={styles.notificationAction}>
-            Saludar 👋
           </div>
         </div>
 
@@ -247,19 +331,24 @@ const Home = () => {
             </div>
           </div>
           <div className={styles.badgesGrid}>
-            {[...Array(Math.min(stats.badges, 2))].map((_, i) => (
-              <div key={i} className={styles.badgeItem}>
-                <div className={styles.badgeCheck}>✓</div>
-                <span className={styles.badgeEmoji}>
-                  {i === 0 ? "🏆" : "🌟"}
-                </span>
-              </div>
-            ))}
-            {[...Array(Math.max(3, 5 - stats.badges))].map((_, i) => (
-              <div key={`locked-${i}`} className={`${styles.badgeItem} ${styles.locked}`}>
-                <span className={styles.badgeEmoji}>❌</span>
-              </div>
-            ))}
+            {ACHIEVEMENT_BADGES.map((badge) => {
+              const isUnlocked = earnedBadges.some(b => b.id === badge.id);
+              return (
+                <div
+                  key={badge.id}
+                  className={`${styles.badgeItem} ${!isUnlocked ? styles.locked : ''}`}
+                  title={isUnlocked ? badge.description : "🔒 Bloqueado"}
+                >
+                  {isUnlocked && <div className={styles.badgeCheck}>✓</div>}
+                  <span className={styles.badgeEmoji}>
+                    {isUnlocked ? badge.icon : "❌"}
+                  </span>
+                  <div className={styles.badgeName}>
+                    {isUnlocked ? badge.name : "???"}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 

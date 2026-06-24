@@ -158,3 +158,310 @@
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* LessonView Styles */
+.lessonViewContainer {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 20px;
+  padding-bottom: 100px;
+}
+
+.lessonHeader {
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-md);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.backButton {
+  background: var(--bg-secondary);
+  color: var(--text);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.backButton:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: translateX(-4px);
+}
+
+.lessonHeaderInfo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lessonIcon {
+  font-size: 48px;
+}
+
+.lessonTitle {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 4px 0;
+}
+
+.lessonDescription {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.lessonMeta {
+  display: flex;
+  gap: 12px;
+}
+
+.xpBadge {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.lessonContent {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.explanationSection {
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--border);
+}
+
+.explanationText {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.exercisesSection {
+  margin-bottom: 24px;
+}
+
+.exerciseCard {
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--border);
+  transition: var(--transition);
+}
+
+.exerciseCard:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.exerciseHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.exerciseNumber {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(124, 58, 237, 0.1);
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+}
+
+.correctBadge {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.incorrectBadge {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.exerciseQuestion {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.optionButton {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+}
+
+.optionButton:hover:not(:disabled) {
+  background: var(--card);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.optionButton.selected {
+  background: rgba(124, 58, 237, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.optionButton.correctOption {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+.optionButton.incorrectOption {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.optionButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.exerciseExplanation {
+  background: rgba(59, 130, 246, 0.1);
+  border-left: 4px solid #3b82f6;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.submitButton,
+.retryButton,
+.continueButton {
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: var(--radius-lg);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow-md);
+}
+
+.submitButton {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.resultsActions {
+  display: flex;
+  gap: 16px;
+}
+
+.retryButton {
+  background: var(--bg-secondary);
+  color: var(--text);
+  border: 2px solid var(--border);
+}
+
+.retryButton:hover {
+  background: var(--card);
+  transform: translateY(-2px);
+}
+
+.continueButton {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+}
+
+.continueButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+}
+
+@media (max-width: 768px) {
+  .lessonHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .lessonHeaderInfo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .optionsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .resultsActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .retryButton,
+  .continueButton {
+    width: 100%;
+  }
+}

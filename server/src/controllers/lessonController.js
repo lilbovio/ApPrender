@@ -6,18 +6,20 @@ import Lesson from '../models/Lesson.js';
 export const getLessons = async (req, res, next) => {
   try {
     const subject = req.params.subject;
-    const userVakType = req.user.vakType;
+    const userVakType = req.user?.vakType;
 
     if (!['math', 'english'].includes(subject)) {
       res.status(400);
       throw new Error('Invalid subject');
     }
 
-    // Get lessons matching subject and user's VAK type (or 'all' fallback)
-    const query = {
-      subject,
-      $or: [{ vakType: userVakType }, { vakType: 'all' }]
-    };
+    // Get lessons matching subject
+    // If user has a VAK type, prioritize those lessons, otherwise show all
+    const query = { subject };
+    
+    if (userVakType) {
+      query.$or = [{ vakType: userVakType }, { vakType: 'all' }];
+    }
 
     const lessons = await Lesson.find(query).sort({ grade: 1, createdAt: 1 });
     res.json(lessons);
