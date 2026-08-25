@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import styles from "./Login.module.css";
-import ChispappLogo from "../../assets/ChispappICON.png";
+import ApPrenderLogo from "../../assets/ApPrenderICON.png";
 
 /**
  * Login — Pantalla de inicio de sesión
@@ -55,7 +55,7 @@ const Login = () => {
           {/* Header con logo */}
           <div className={styles.header}>
             <div className={styles.logoContainer}>
-              <img src={ChispappLogo} alt="Chispa Logo" className={styles.logo} />
+              <img src={ApPrenderLogo} alt="Chispa Logo" className={styles.logo} />
             </div>
             <h1 className={styles.title}>Chispa</h1>
             <p className={styles.subtitle}>Tu plataforma de aprendizaje adaptativo</p>

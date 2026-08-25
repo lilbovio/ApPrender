@@ -1,4 +1,4 @@
-# 🎒 Chispapp (ApPrender) — Project Context
+# 🎒 ApPrender (ApPrender) — Project Context
 
 This file serves as a comprehensive reference of the project so that any new Artificial Intelligence (AI) model or developer can quickly understand its architecture, data flow, technologies, and file organization.
 
@@ -6,7 +6,7 @@ This file serves as a comprehensive reference of the project so that any new Art
 
 ## 📌 Project Overview
 
-**Chispapp** (also referred to as **ApPrender**) is an interactive and adaptive educational web platform designed for primary school children (generally ages 6 to 12). Its goal is to reinforce basic subjects like **Mathematics and English** by adapting the content format to each child's predominant learning style using the **VAK (Visual, Auditory, Kinesthetic) model**.
+**ApPrender** (also referred to as **ApPrender**) is an interactive and adaptive educational web platform designed for primary school children (generally ages 6 to 12). Its goal is to reinforce basic subjects like **Mathematics and English** by adapting the content format to each child's predominant learning style using the **VAK (Visual, Auditory, Kinesthetic) model**.
 
 ### 🧠 How Adaptability Works
 1. **Style Assessment (VAK Test):** Upon registration, students take an interactive dynamic test with illustrated questions and answers. When completed, the system calculates whether the predominant learning style is **Visual**, **Auditory**, or **Kinesthetic**.

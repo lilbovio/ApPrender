@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1200&auto=format&fit=crop" alt="Kids learning" width="100%" style="border-radius: 15px; margin-bottom: 20px;"/>
 
-  # ✨ Chispapp: Adaptive Learning for Kids ✨
+  # ✨ ApPrender: Adaptive Learning for Kids ✨
 
   <p>A full-stack educational platform designed for primary school students. Reinforces mathematics and English by adapting to each child's learning style (Visual, Auditory, or Kinesthetic).</p>
 

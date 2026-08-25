@@ -1,4 +1,4 @@
-// 5 Starter English Lessons for Chispapp
+// 5 Starter English Lessons for ApPrender
 // Each lesson includes VAK-adapted content
 
 export const englishStarterLessons = [

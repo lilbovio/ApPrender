@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./Sidebar.module.css";
-import chispappIcon from "../../assets/ChispappICON.png";
+import apPrenderIcon from "../../assets/ApPrenderICON.png";
 
 /**
  * Sidebar Component
@@ -28,11 +28,11 @@ const Sidebar = ({ stats = { completed: 0, total: 5 } }) => {
       {/* Logo Section */}
       <div className={styles.logoSection}>
         <img 
-          src={chispappIcon} 
-          alt="Chispapp Logo" 
+          src={apPrenderIcon} 
+          alt="ApPrender Logo" 
           className={styles.logoIcon}
         />
-        <span className={styles.logoText}>Chispapp</span>
+        <span className={styles.logoText}>ApPrender</span>
       </div>
 
       {/* Navigation Menu */}

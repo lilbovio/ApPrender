@@ -16,7 +16,7 @@ const TopNavbar = ({ user = null, stats = { level: 1, xp: 0, coins: 0, trophies:
     <>
       {/* App Title Bar */}
       <div className={styles.titleBar}>
-        <span className={styles.appTitle}>Chispapp</span>
+        <span className={styles.appTitle}>ApPrender</span>
       </div>
 
       {/* Main Navbar */}
@@ -24,7 +24,7 @@ const TopNavbar = ({ user = null, stats = { level: 1, xp: 0, coins: 0, trophies:
         <div className={styles.navbarContent}>
           {/* Left Section - Logo */}
           <div className={styles.leftSection}>
-            <span className={styles.navbarLogo}>Chispapp</span>
+            <span className={styles.navbarLogo}>ApPrender</span>
           </div>
 
           {/* Right Section - Stats and Avatar */}

@@ -1,4 +1,4 @@
-// 5 Achievement Badges for Chispapp
+// 5 Achievement Badges for ApPrender
 // Each badge has unlock criteria based on user progress
 
 export const achievementBadges = [

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import styles from "./Login.module.css";
-import ChispappLogo from "../../assets/ChispappICON.png";
+import ApPrenderLogo from "../../assets/ApPrenderICON.png";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ const Register = () => {
         <div className={styles.card}>
           <div className={styles.header}>
             <div className={styles.logoContainer}>
-              <img src={ChispappLogo} alt="Chispa Logo" className={styles.logo} />
+              <img src={ApPrenderLogo} alt="Chispa Logo" className={styles.logo} />
             </div>
             <h1 className={styles.title}>Crea tu cuenta</h1>
             <p className={styles.subtitle}>Únete para aprender jugando</p>

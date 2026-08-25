@@ -1,4 +1,4 @@
-// 5 Starter Math Lessons for Chispapp
+// 5 Starter Math Lessons for ApPrender
 // Each lesson includes VAK-adapted content
 
 export const mathStarterLessons = [
