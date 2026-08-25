@@ -1,9 +1,9 @@
 <div align="center">
-  <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1200&auto=format&fit=crop" alt="Niños aprendiendo" width="100%" style="border-radius: 15px; margin-bottom: 20px;"/>
+  <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1200&auto=format&fit=crop" alt="Kids learning" width="100%" style="border-radius: 15px; margin-bottom: 20px;"/>
 
-  # ✨ Chispapp: Aprendizaje Adaptativo para Niños ✨
+  # ✨ Chispapp: Adaptive Learning for Kids ✨
 
-  <p>Una plataforma educativa full-stack diseñada para estudiantes de primaria. Refuerza matemáticas e inglés adaptándose al estilo de aprendizaje de cada niño (Visual, Auditivo o Kinestésico).</p>
+  <p>A full-stack educational platform designed for primary school students. Reinforces mathematics and English by adapting to each child's learning style (Visual, Auditory, or Kinesthetic).</p>
 
   <div>
     <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
@@ -16,66 +16,66 @@
 
 ---
 
-## 🚀 Características Principales
+## 🚀 Key Features
 
-*   🧠 **Test VAK Integrado:** Al registrarse, los niños realizan una pequeña evaluación para descubrir su modelo de aprendizaje predominante.
-*   🎯 **Contenido Personalizado:** El sistema de Backend clasifica y envía lecciones adaptadas (con imágenes, audios o juegos) dependiendo de si el alumno es Visual, Auditivo o Kinestésico.
-*   🎮 **Gamificación:** Sistema de XP (Puntos de Experiencia), rachas diarias y progreso en tiempo real para mantener a los niños motivados.
-*   🔒 **Seguridad y Autenticación:** Cuentas protegidas con JSON Web Tokens (JWT) y contraseñas encriptadas con Bcrypt.
+*   🧠 **Built-in VAK Test:** Upon registration, children take a short assessment to discover their predominant learning style.
+*   🎯 **Personalized Content:** The backend system classifies and delivers tailored lessons (with images, audio, or games) based on whether the student is Visual, Auditory, or Kinesthetic.
+*   🎮 **Gamification:** XP (Experience Points), daily streaks, and real-time progress tracking to keep kids motivated.
+*   🔒 **Security & Authentication:** Accounts protected with JSON Web Tokens (JWT) and passwords encrypted with Bcrypt.
 
-## 📁 Estructura del Proyecto
+## 📁 Project Structure
 
-El repositorio está dividido en dos partes principales:
+The repository is divided into two main parts:
 
-*   `/client` - Frontend desarrollado en **React** y **Vite**, usando CSS Modules y diseño Mobile-First con interfaces coloridas para niños.
-*   `/server` - Backend RESTful API desarrollado en **Node.js** y **Express** con base de datos NoSQL en **MongoDB**.
+*   `/client` - Frontend built with **React** and **Vite**, using CSS Modules and a Mobile-First design with colorful kid-friendly interfaces.
+*   `/server` - RESTful API backend built with **Node.js** and **Express** using a NoSQL **MongoDB** database.
 
-## 🛠️ Requisitos Previos
+## 🛠️ Prerequisites
 
-Antes de comenzar, asegúrate de tener instalado en tu máquina:
-- [Node.js](https://nodejs.org/es/) (v16 o superior)
-- [MongoDB](https://www.mongodb.com/) (Local o una cuenta en MongoDB Atlas)
+Before getting started, make sure you have the following installed on your machine:
+- [Node.js](https://nodejs.org/) (v16 or higher)
+- [MongoDB](https://www.mongodb.com/) (Local or a MongoDB Atlas account)
 
-## 💻 Instalación y Ejecución Local
+## 💻 Installation & Local Setup
 
-Sigue estos pasos para correr el proyecto en tu computadora:
+Follow these steps to run the project on your computer:
 
-### 1. Clonar el repositorio
+### 1. Clone the repository
 ```bash
-git clone <url-de-tu-repositorio>
+git clone <your-repository-url>
 cd math-english-kids
 ```
 
-### 2. Configurar el Backend (Servidor)
+### 2. Set up the Backend (Server)
 ```bash
 cd server
 npm install
 ```
-Crea un archivo llamado `.env` en la carpeta `server` y añade tus variables de entorno:
+Create a file called `.env` in the `server` folder and add your environment variables:
 ```env
 PORT=5000
 NODE_ENV=development
-MONGO_URI=mongodb://127.0.0.1:27017/edukids  # Cambia por tu URI de Mongo Atlas si es necesario
-JWT_SECRET=tu_secreto_super_seguro
+MONGO_URI=mongodb://127.0.0.1:27017/edukids  # Replace with your Mongo Atlas URI if needed
+JWT_SECRET=your_super_secure_secret
 CLIENT_URL=http://localhost:5173
 ```
-Poblar la base de datos con las lecciones por defecto y encender el servidor:
+Seed the database with default lessons and start the server:
 ```bash
-npm run seed     # (Opcional) Rellena la BD con contenido inicial
-npm run dev      # Inicia el servidor de Node en modo desarrollo
+npm run seed     # (Optional) Populates the DB with initial content
+npm run dev      # Starts the Node server in development mode
 ```
 
-### 3. Configurar el Frontend (Cliente)
-En una nueva ventana de la terminal, entra a la carpeta del cliente:
+### 3. Set up the Frontend (Client)
+In a new terminal window, navigate to the client folder:
 ```bash
 cd client
 npm install
 npm run dev
 ```
 
-La aplicación web estará disponible en [http://localhost:5173](http://localhost:5173).
+The web application will be available at [http://localhost:5173](http://localhost:5173).
 
 ---
 <div align="center">
-  <i>Desarrollado con ❤️ para transformar la educación primaria.</i>
+  <i>Built with ❤️ to transform primary education.</i>
 </div>
