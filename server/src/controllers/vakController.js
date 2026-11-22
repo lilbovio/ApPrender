@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import { recordUserEventSafe } from '../ledger/recordSafe.js';
 
 // @desc    Update user VAK type
 // @route   PUT /api/vak
@@ -17,7 +18,8 @@ export const updateVakType = async (req, res, next) => {
     if (user) {
       user.vakType = vakType;
       const updatedUser = await user.save();
-      
+
+      await recordUserEventSafe('vak_set', updatedUser);
       res.json({
         vakType: updatedUser.vakType
       });

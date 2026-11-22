@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import { generateToken } from '../config/jwt.js';
+import { recordUserEventSafe } from '../ledger/recordSafe.js';
 
 // @desc    Auth user & get token
 // @route   POST /api/auth/login
@@ -49,6 +50,7 @@ export const registerUser = async (req, res, next) => {
     });
 
     if (user) {
+      await recordUserEventSafe('user_registered', user);
       res.status(201).json({
         _id: user._id,
         name: user.name,
