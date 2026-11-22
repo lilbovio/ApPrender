@@ -1,0 +1,11 @@
+{
+  "name": "apprender-blockchain",
+  "version": "1.0.0",
+  "description": "Mini-blockchain (base de datos encadenada con SHA-256) - Proyecto final IH063 Criptografía",
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "demo": "node cli.js demo",
+    "verify": "node cli.js verify"
+  }
+}
