@@ -6,7 +6,9 @@
   "scripts": {
     "test": "node --test",
     "demo": "node cli.js demo",
-    "verify": "node cli.js verify"
+    "verify": "node cli.js verify",
+    "ledger:init": "node --env-file=../server/.env ledger/init.js",
+    "ledger:verify": "node --env-file=../server/.env ledger/verifyLedger.js"
   },
   "dependencies": {
     "mongoose": "^9.6.1"
