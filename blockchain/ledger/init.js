@@ -23,6 +23,8 @@ export async function run({
     log('Modo simulación: no se conecta a la base de datos ni escribe nada.');
     log('Haría: crear los índices únicos de ledgerblocks y el bloque génesis (índice 0) si no existe.');
     log('Para ejecutarlo de verdad: npm run ledger:init -- --confirm');
+    const uri = process.env.MONGO_URI;
+    log(uri ? `Destino: ${describeTarget(uri)}` : 'Destino: MONGO_URI no definida');
     return 0;
   }
 
