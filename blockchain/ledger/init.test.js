@@ -80,6 +80,35 @@ test('sin --confirm no conecta, no escribe y sale con código 0', async () => {
   assert.match(output, /no se conecta/);
 });
 
+test('la simulación muestra el destino sin conectar ni exponer credenciales', async () => {
+  const driver = fakeDriver();
+  const model = fakeModel();
+  const { code, lines, output } = await runWithUri({ argv: [], driver, model });
+
+  assert.equal(code, 0);
+  assert.equal(driver.connectCalls, 0);
+  assert.equal(model.calls.create, 0);
+  assert.ok(lines.includes('Destino: base de datos: apprender'), `falta la línea Destino: ${output}`);
+  assert.equal(output.includes('usuarioFalso'), false);
+  assert.equal(output.includes('claveFalsa'), false);
+  assert.equal(output.includes('hostFalso'), false);
+});
+
+test('la simulación indica que MONGO_URI no está definida y devuelve 0', async () => {
+  const previous = process.env.MONGO_URI;
+  delete process.env.MONGO_URI;
+  const lines = [];
+  const driver = fakeDriver();
+  try {
+    const code = await run({ argv: [], driver, model: fakeModel(), log: (line) => lines.push(String(line)) });
+    assert.equal(code, 0);
+    assert.ok(lines.includes('Destino: MONGO_URI no definida'));
+    assert.equal(driver.connectCalls, 0);
+  } finally {
+    if (previous !== undefined) process.env.MONGO_URI = previous;
+  }
+});
+
 test('con --confirm conecta, crea índices y el génesis, y desconecta', async () => {
   const driver = fakeDriver();
   const model = fakeModel();

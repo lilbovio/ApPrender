@@ -42,22 +42,49 @@ export async function disconnectDB(driver = mongoose) {
   }
 }
 
+const UNKNOWN_TARGET = 'base de datos: desconocida (URI no válida)';
+const UNRECOGNIZED_TARGET = 'base de datos: (nombre no reconocido)';
+const DEFAULT_DB_TARGET = 'base de datos: (no especificada en la URI; MongoDB usará "test")';
+const SCHEMES = ['mongodb://', 'mongodb+srv://'];
+
 // Describe el destino de forma segura para logs: solo el nombre de la base de datos.
-// Nunca devuelve usuario, contraseña ni host.
+// Nunca devuelve usuario, contraseña ni host, y no usa `new URL` porque falla con listas
+// de varios hosts (mongodb://h1:27017,h2:27017/...). El análisis es manual:
+//   - las credenciales terminan en el ÚLTIMO '@' (los hosts nunca contienen '@');
+//   - la lista de hosts termina en el primer '/' posterior;
+//   - el nombre de la base de datos es el tramo entre ese '/' y el '?'.
 export function describeTarget(uri) {
-  let url;
-  try {
-    url = new URL(uri);
-  } catch {
-    return 'base de datos: desconocida (URI no válida)';
+  if (typeof uri !== 'string' || uri === '') {
+    return UNKNOWN_TARGET;
+  }
+  const scheme = SCHEMES.find((s) => uri.startsWith(s));
+  if (!scheme) {
+    return UNKNOWN_TARGET;
   }
 
-  const name = url.pathname.replace(/^\/+/, '');
-  if (!name) {
-    return 'base de datos: (no especificada en la URI)';
+  let rest = uri.slice(scheme.length);
+  const at = rest.lastIndexOf('@');
+  if (at !== -1) {
+    rest = rest.slice(at + 1);
+  }
+
+  const slash = rest.indexOf('/');
+  if (slash === -1) {
+    return DEFAULT_DB_TARGET;
+  }
+  const rawName = rest.slice(slash + 1).split('?')[0];
+  if (rawName === '') {
+    return DEFAULT_DB_TARGET;
+  }
+
+  let name;
+  try {
+    name = decodeURIComponent(rawName);
+  } catch {
+    return UNRECOGNIZED_TARGET;
   }
   if (!SAFE_DB_NAME.test(name)) {
-    return 'base de datos: (nombre no reconocido)';
+    return UNRECOGNIZED_TARGET;
   }
   return `base de datos: ${name}`;
 }
