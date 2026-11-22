@@ -10,7 +10,8 @@
     "ledger:init": "node --env-file=../server/.env ledger/init.js",
     "ledger:verify": "node --env-file=../server/.env ledger/verifyLedger.js",
     "ledger:verify-users": "node --env-file=../server/.env ledger/verifyUsers.js",
-    "ledger:backfill": "node --env-file=../server/.env ledger/backfill.js"
+    "ledger:backfill": "node --env-file=../server/.env ledger/backfill.js",
+    "ledger:tamper": "node --env-file=../server/.env ledger/tamper.js"
   },
   "dependencies": {
     "mongoose": "^9.6.1"
