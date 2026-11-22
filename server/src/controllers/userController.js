@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import { recordUserEventSafe } from '../ledger/recordSafe.js';
 
 // @desc    Get user profile
 // @route   GET /api/users/profile
@@ -42,6 +43,8 @@ export const updateUserProfile = async (req, res, next) => {
       }
 
       const updatedUser = await user.save();
+
+      await recordUserEventSafe(req.body.password ? 'password_changed' : 'profile_updated', updatedUser);
 
       res.json({
         _id: updatedUser._id,
