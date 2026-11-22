@@ -8,7 +8,8 @@
     "demo": "node cli.js demo",
     "verify": "node cli.js verify",
     "ledger:init": "node --env-file=../server/.env ledger/init.js",
-    "ledger:verify": "node --env-file=../server/.env ledger/verifyLedger.js"
+    "ledger:verify": "node --env-file=../server/.env ledger/verifyLedger.js",
+    "ledger:verify-users": "node --env-file=../server/.env ledger/verifyUsers.js"
   },
   "dependencies": {
     "mongoose": "^9.6.1"
