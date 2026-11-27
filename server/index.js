@@ -26,11 +26,29 @@ const PORT = process.env.PORT || 5000
 
 // ─── Middleware ────────────────────────────────────────────────────────────────
 
-// CORS configuration for both local development and production
+// CORS configuration for both local development and production.
+// Extra origins come from CLIENT_URL (comma-separated), e.g.
+//   CLIENT_URL=https://tudominio.com,https://www.tudominio.com
+// Browsers send Origin without a trailing slash, so entries are normalized. For each custom
+// domain the www / non-www twin is allowed too, so setting just one of them is enough.
+const normalizeOrigin = (url) => url.trim().replace(/\/+$/, '').toLowerCase();
+
+const envOrigins = (process.env.CLIENT_URL || '')
+  .split(',')
+  .map(normalizeOrigin)
+  .filter(Boolean)
+  .flatMap((origin) => {
+    const match = origin.match(/^(https?:\/\/)(www\.)?(.+)$/);
+    if (!match) return [origin];
+    const [, scheme, , host] = match;
+    return [`${scheme}${host}`, `${scheme}www.${host}`];
+  });
+
 const allowedOrigins = [
-  /^http:\/\/localhost:\d+$/,  // Local development (any port)
-  'https://ap-prender-client.vercel.app/',  // Production frontend
-  /^https:\/\/ap-prender-client.*\.vercel\.app$/  // Vercel preview deployments
+  /^http:\/\/localhost:\d+$/,                       // Local development (any port)
+  'https://ap-prender-client.vercel.app',           // Production frontend (Vercel URL)
+  /^https:\/\/ap-prender-client.*\.vercel\.app$/,   // Vercel preview deployments
+  ...envOrigins,                                    // Custom domain(s) from CLIENT_URL
 ];
 
 app.use(cors({
@@ -39,11 +57,12 @@ app.use(cors({
     if (!origin) return callback(null, true);
     
     // Check if origin matches any allowed pattern
+    const requestOrigin = normalizeOrigin(origin);
     const isAllowed = allowedOrigins.some(allowedOrigin => {
       if (allowedOrigin instanceof RegExp) {
-        return allowedOrigin.test(origin);
+        return allowedOrigin.test(requestOrigin);
       }
-      return allowedOrigin === origin;
+      return allowedOrigin === requestOrigin;
     });
     
     if (isAllowed) {
