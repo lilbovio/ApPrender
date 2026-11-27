@@ -1,187 +1,301 @@
-.profileContainer {
-  min-height: 100vh;
-  background: var(--bg);
-  padding: 20px;
-  padding-bottom: 100px;
+/* Profile.module.css — "Perfil" screen with badges (DESIGN.md sections 4, 7, 12, 14). */
+
+/*
+ * Mobile order (single column): identity, stats, badges, settings.
+ * Identity is the header + superpower chips (source order, order 0).
+ * .left and .right are display: contents below 900 px, so their children join the column
+ * and the `order` values below sort them. At 900 px and up they become real flex columns.
+ */
+.columns {
+  display: flex;
+  flex-direction: column;
 }
 
-.header {
+.left,
+.right {
+  display: contents;
+}
+
+.stats {
+  order: 2;
+}
+
+.badges {
+  order: 3;
+}
+
+.settings {
+  order: 4;
+}
+
+.hero {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 30px;
+  gap: var(--s-4);
 }
 
-.backButton {
-  position: absolute;
-  left: 0;
-  background: var(--card);
-  border: 1px solid var(--border);
-  padding: 8px 12px;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--primary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s ease;
+.avatarCircle {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--r-pill);
+  background: var(--accent-soft);
 }
 
-.backButton:hover {
-  transform: translateX(-2px);
+.heroText {
+  min-width: 0;
 }
 
 .title {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--text);
-  margin-bottom: 0;
-}
-
-.avatarSection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.avatarContainer {
-  position: relative;
-  width: 120px;
-  height: 120px;
-  margin-bottom: 16px;
-}
-
-.avatarWrapper {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 50px;
-  color: white;
-  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
-  overflow: hidden;
-  border: 4px solid white;
-}
-
-.avatarImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.editAvatarBtn {
-  position: absolute;
-  bottom: 0;
-  right: -5px;
-  background: var(--secondary);
-  color: white;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 3px solid white;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(236, 72, 153, 0.4);
-  transition: transform 0.2s ease;
-  z-index: 10;
-}
-
-.editAvatarBtn:hover {
-  transform: scale(1.1);
-}
-
-.fileInput {
-  display: none;
-}
-
-.formSection {
-  background: var(--card);
-  padding: 24px;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 24px;
-}
-
-.formTitle {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 20px;
-  border-bottom: 2px solid var(--border-light);
-  padding-bottom: 10px;
-}
-
-.inputGroup {
-  margin-bottom: 16px;
-}
-
-.label {
-  display: block;
-  font-size: 14px;
+  margin: 0;
+  font-family: var(--font-story);
+  font-size: var(--type-story);
   font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  color: var(--ink);
+  overflow-wrap: anywhere;
 }
 
-.input {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: var(--radius-md);
-  border: 2px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 15px;
-  transition: var(--transition);
+.level {
+  margin: var(--s-1) 0 0;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--body);
 }
 
-.input:focus {
+.superpower {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: var(--s-5);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--s-3);
+  margin-top: var(--s-5);
+}
+
+.stat {
+  display: grid;
+  gap: var(--s-1);
+  min-width: 0;
+  padding: var(--s-4);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.statNumber {
+  font-family: var(--font-ui);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.statLabel {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--body);
+}
+
+.section {
+  margin-top: var(--s-6);
+  min-width: 0;
+}
+
+.h2 {
+  margin: 0 0 var(--s-3);
+  font-family: var(--font-story);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+/* Programmatic focus from the #logros jump; no ring on the heading itself. */
+.h2:focus {
   outline: none;
-  border-color: var(--primary);
-  background: white;
-  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
 }
 
-.saveButton {
-  width: 100%;
-  padding: 14px;
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 16px;
+.note {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--body);
+}
+
+.errorWrap {
+  display: grid;
+  gap: var(--s-2);
+  justify-items: start;
+}
+
+.form {
+  display: grid;
+  gap: var(--s-4);
+}
+
+.avatarBlock {
+  display: grid;
+  gap: var(--s-2);
+}
+
+/* Micro label (DESIGN.md section 3): Nunito 11px, 700, tracking 0.1em, uppercase. Sparingly. */
+.microLabel {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 11px;
   font-weight: 700;
-  cursor: pointer;
-  transition: var(--transition);
-  margin-top: 10px;
+  letter-spacing: 0.1em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--body);
 }
 
-.saveButton:hover {
-  background: var(--primary-dark);
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+.photoRow {
+  position: relative;
+  display: grid;
+  gap: var(--s-1);
+  justify-items: start;
 }
 
-.logoutButton {
-  width: 100%;
-  padding: 14px;
-  background: transparent;
-  color: var(--error);
-  border: 2px solid var(--error);
-  border-radius: var(--radius-md);
+/* Visually hidden but focusable; the paired label is the visible control. */
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Quiet button look: accent text, no fill until hover. */
+.uploadLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0 12px;
+  border-radius: var(--r-sm);
+  font-family: var(--font-ui);
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--accent);
   cursor: pointer;
-  transition: var(--transition);
+  transition: background-color var(--dur-micro) var(--ease-ui);
 }
 
-.logoutButton:hover {
-  background: rgba(239, 68, 68, 0.1);
+@media (hover: hover) and (pointer: fine) {
+  .uploadLabel:hover {
+    background: var(--surface-soft);
+  }
+}
+
+.fileInput:focus-visible + .uploadLabel {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Always rendered so the aria-live region exists before the hint text arrives. */
+.photoHint {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--body);
+}
+
+.fieldError {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--error-ink);
+}
+
+.passwordBlock {
+  display: grid;
+  gap: var(--s-4);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--hairline);
+}
+
+.h3 {
+  margin: 0;
+  font-family: var(--font-story);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.saved {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  background: var(--mint);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.save {
+  margin-top: var(--s-2);
+}
+
+.logout {
+  margin-top: var(--s-4);
+}
+
+/* Desktop: two columns. Spacing comes from the grid and flex gaps, not section margins. */
+@media (min-width: 900px) {
+  .columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s-6);
+    align-items: start;
+  }
+
+  .left,
+  .right {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-5);
+    min-width: 0;
+  }
+
+  .stats,
+  .badges,
+  .settings {
+    order: 0;
+  }
+
+  .superpower,
+  .stats,
+  .section {
+    margin-top: 0;
+  }
 }

@@ -1,0 +1,48 @@
+.group {
+  display: flex;
+  gap: var(--s-3);
+}
+
+.option {
+  box-sizing: border-box;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--accent);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-micro) var(--ease-ui),
+    border-color var(--dur-micro) var(--ease-ui);
+}
+
+.selected {
+  border: 2px solid var(--accent);
+  background: var(--accent-soft);
+}
+
+.option:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Photo avatars: fill the circle; width and height come from the inline style (size prop). */
+.photo {
+  display: block;
+  flex-shrink: 0;
+  border-radius: var(--r-pill);
+  object-fit: cover;
+}
+
+/* "Mi foto" thumbnail inside a picker option. */
+.thumb {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--r-md);
+  object-fit: cover;
+}

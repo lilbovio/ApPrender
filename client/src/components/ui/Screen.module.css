@@ -1,0 +1,48 @@
+.screen {
+  min-height: 100dvh;
+  background: var(--canvas);
+  color: var(--ink);
+  --screen-max: var(--content-max);
+}
+
+/* Per-screen content caps (DESIGN.md section 14). */
+.survey {
+  --screen-max: min(var(--content-max), 720px);
+}
+
+.lesson {
+  --screen-max: min(var(--content-max), 900px);
+}
+
+.auth {
+  --screen-max: min(var(--content-max), 460px);
+}
+
+@media (min-width: 900px) {
+  .auth {
+    --screen-max: 960px;
+  }
+}
+
+/* Mobile and tablet reserve room for the bottom nav. Desktop reserves the left rail instead. */
+.withNav {
+  padding-bottom: 96px;
+}
+
+@media (min-width: 900px) {
+  .withNav {
+    padding-bottom: 0;
+    padding-left: var(--rail-width);
+  }
+}
+
+.inner {
+  width: min(100% - 2 * var(--gutter), var(--screen-max, var(--content-max)));
+  margin-inline: auto;
+  padding-block: var(--s-5);
+}
+
+.bleed {
+  width: 100%;
+  padding: 0;
+}

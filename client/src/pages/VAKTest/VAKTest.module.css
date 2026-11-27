@@ -1,135 +1,187 @@
-.testContainer {
-  min-height: 100vh;
-  background: var(--bg);
-  padding: 40px 20px;
+/* VAK survey: intro, question, result. Tokens only; mobile-first. Screen size="survey" caps width (720 px at most). */
+
+/* Intro */
+.intro {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  gap: var(--s-5);
+  padding-top: var(--s-4);
 }
 
-.resultContainer {
-  min-height: 100vh;
-  background: var(--bg);
-  padding: 40px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.progressContainer {
-  width: 100%;
-  max-width: 500px;
-  height: 10px;
-  background: var(--border);
-  border-radius: var(--radius-lg);
-  margin-bottom: 40px;
-  overflow: hidden;
-}
-
-.progressBar {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
-  transition: width 0.4s ease;
-}
-
-.card {
-  background: var(--card);
-  padding: 30px 24px;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  width: 100%;
-  max-width: 500px;
-  text-align: center;
-  border-top: 6px solid var(--primary);
-}
-
-.questionTitle {
-  font-size: 22px;
-  color: var(--text);
-  font-weight: 700;
-  margin-bottom: 30px;
-  line-height: 1.4;
-}
-
-.optionsList {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.optionButton {
-  background: var(--bg-secondary);
-  border: 2px solid transparent;
-  padding: 16px 20px;
-  border-radius: var(--radius-lg);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  font-size: 16px;
-  color: var(--text);
+.introTitle,
+.resultTitle {
+  margin: 0;
+  font-family: var(--font-story);
+  font-size: var(--type-story);
   font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--type-body);
+  line-height: 1.5;
+  color: var(--body);
+}
+
+.intro .body {
+  max-width: 36ch;
+}
+
+/* Question */
+.questionWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.topRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+
+.topLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+}
+
+.pilo {
+  margin-left: auto;
+}
+
+.prompt {
+  margin: var(--s-2) 0 0;
+  font-family: var(--font-story);
+  font-size: min(var(--type-story), 40px);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.support {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--type-body);
+  line-height: 1.5;
+  color: var(--body);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  margin-top: var(--s-2);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.25;
   text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-micro) var(--ease-ui),
+    border-color var(--dur-micro) var(--ease-ui);
 }
 
-.optionButton:hover {
-  background: var(--hover);
-  border-color: var(--primary);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+.option:disabled {
+  cursor: default;
 }
 
-.optionIcon {
-  font-size: 32px;
+.option:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.optionSelected,
+.optionSelected:disabled {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.tile {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-sm);
+  background: var(--surface-soft);
+  color: var(--accent);
 }
 
 .optionText {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-.iconLarge {
-  font-size: 72px;
-  margin-bottom: 20px;
-  animation: bounce 2s infinite;
+.unknown {
+  display: flex;
+  justify-content: center;
 }
 
-.resultTitle {
-  font-size: 28px;
-  color: var(--primary);
-  margin-bottom: 16px;
-  text-transform: capitalize;
+/* Result */
+.result {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-4);
+  padding-top: var(--s-4);
 }
 
-.resultDesc {
-  font-size: 16px;
-  color: var(--text-secondary);
-  margin-bottom: 30px;
+.resultPilo {
+  display: block;
+  margin-bottom: var(--s-2);
+  transform-origin: left bottom;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+
+.accentBlock {
+  align-self: stretch;
+  margin: 0;
+  padding: var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  font-family: var(--font-body);
+  font-size: var(--type-body);
   line-height: 1.5;
+  color: var(--ink);
 }
 
-.continueButton {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  color: white;
-  border: none;
-  padding: 18px 32px;
-  border-radius: var(--radius-xl);
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  width: 100%;
-  transition: var(--transition);
-  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4);
-}
+/* Tablet and desktop: taller option cards, larger label, 48 px icon tile. */
+@media (min-width: 600px) {
+  .option {
+    min-height: 72px;
+    font-size: var(--type-ui);
+  }
 
-.continueButton:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(124, 58, 237, 0.5);
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+  .tile {
+    width: 48px;
+    height: 48px;
+  }
 }

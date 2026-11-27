@@ -1,93 +1,136 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import api from "../services/api";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { apiRequest } from "../services/api";
 
 /**
- * AuthContext
- * Maneja: login, register, logout, usuario actual, token JWT.
- * El token se guarda en localStorage para persistir la sesión.
+ * AuthContext — the single auth store.
+ * Persists "token" and "user" (server user without token) in localStorage.
+ * Initial state is read synchronously so protected screens never flash empty.
  */
+
+const TOKEN_KEY = "token";
+const USER_KEY = "user";
+const VAK_SECONDARY_KEY = "apprender.vakSecondary";
 
 const AuthContext = createContext(null);
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);       // { _id, name, email, username, avatar, grade, vakType, ... }
-  const [token, setToken] = useState(() => localStorage.getItem("token"));
-  const [loading, setLoading] = useState(true); // cargando el usuario inicial
-  const [error, setError] = useState(null);
+function readStoredUser() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(USER_KEY));
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
 
-  // Al montar, si hay token, cargar datos del usuario
-  useEffect(() => {
-    if (!token) { setLoading(false); return; }
-    api.get("/auth/me", { headers: { Authorization: `Bearer ${token}` } })
-      .then((res) => setUser(res.data.user))
-      .catch(() => {
-        // Token inválido o expirado
-        localStorage.removeItem("token");
-        setToken(null);
-      })
-      .finally(() => setLoading(false));
-  }, [token]);
+function persist(user, token) {
+  if (token) localStorage.setItem(TOKEN_KEY, token);
+  else localStorage.removeItem(TOKEN_KEY);
+
+  if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
+  else localStorage.removeItem(USER_KEY);
+}
+
+function writeUser(user) {
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
+export function AuthProvider({ children }) {
+  const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY));
+  const [user, setUser] = useState(readStoredUser);
 
   const login = useCallback(async (email, password) => {
-    setError(null);
-    const res = await api.post("/auth/login", { email, password });
-    const { token: newToken, user: newUser } = res.data;
-    localStorage.setItem("token", newToken);
+    const data = await apiRequest("/auth/login", "POST", { email, password });
+    const { token: newToken, ...nextUser } = data;
+    persist(nextUser, newToken);
     setToken(newToken);
-    setUser(newUser);
-    return newUser;
+    setUser(nextUser);
+    return nextUser;
   }, []);
 
-  const register = useCallback(async (name, email, password, grade) => {
-    setError(null);
-    const res = await api.post("/auth/register", { name, email, password, grade });
-    const { token: newToken, user: newUser } = res.data;
-    localStorage.setItem("token", newToken);
+  const register = useCallback(async ({ name, email, password, avatar }) => {
+    const data = await apiRequest("/auth/register", "POST", { name, email, password });
+    const { token: newToken, ...nextUser } = data;
+
+    // Persist and set state in one synchronous block, before any further request.
+    // apiRequest reads the Bearer token from localStorage, so the token must be stored first.
+    persist(nextUser, newToken);
     setToken(newToken);
-    setUser(newUser);
-    return newUser;
+    setUser(nextUser);
+
+    if (!avatar) return nextUser;
+
+    // The avatar merge only adds to the user that already exists.
+    let finalUser;
+    try {
+      const updated = await apiRequest("/users/profile", "PUT", { avatar });
+      const { token: _ignored, ...rest } = updated ?? {};
+      finalUser = { ...nextUser, ...rest };
+    } catch {
+      // Avatar is cosmetic: keep it locally instead of failing the registration.
+      finalUser = { ...nextUser, avatar };
+    }
+    persist(finalUser, newToken);
+    setUser(finalUser);
+    return finalUser;
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem("token");
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(VAK_SECONDARY_KEY);
+    localStorage.removeItem("apprender.week");
     setToken(null);
     setUser(null);
   }, []);
 
-  // Actualizar datos del usuario localmente (ej. tras editar perfil)
-  const updateUser = useCallback((updates) => {
-    setUser((prev) => ({ ...prev, ...updates }));
+  // Sign-out to the landing (DESIGN.md §7): clear auth storage, then do a full navigation.
+  // React state is left alone on purpose, so no re-render lets the route guard redirect to /login
+  // before the page unloads; the fresh page boots with empty storage.
+  const signOut = useCallback(() => {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(VAK_SECONDARY_KEY);
+    localStorage.removeItem("apprender.week");
+    window.location.replace("/");
   }, []);
 
-  // Guardar tipo VAK tras el test inicial
-  const saveVAKType = useCallback(async (vakType) => {
-    const res = await api.patch(
-      "/auth/vak",
-      { vakType },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    setUser((prev) => ({ ...prev, vakType }));
-    return res.data;
-  }, [token]);
+  const updateUser = useCallback((updates) => {
+    setUser((prev) => {
+      const next = { ...(prev ?? {}), ...updates };
+      writeUser(next);
+      return next;
+    });
+  }, []);
 
-  const value = {
-    user,
-    token,
-    loading,
-    error,
-    isAuthenticated: !!user,
-    hasVAKType: !!user?.vakType,
-    login,
-    register,
-    logout,
-    updateUser,
-    saveVAKType,
-  };
+  const saveVAKType = useCallback(async (vakType) => {
+    const response = await apiRequest("/vak", "PUT", { vakType });
+    setUser((prev) => {
+      const next = { ...(prev ?? {}), vakType };
+      writeUser(next);
+      return next;
+    });
+    return response;
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      user,
+      token,
+      isAuthenticated: !!token,
+      hasVAKType: !!user?.vakType,
+      login,
+      register,
+      logout,
+      signOut,
+      updateUser,
+      saveVAKType,
+    }),
+    [user, token, login, register, logout, signOut, updateUser, saveVAKType]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-// Hook de uso
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth debe usarse dentro de <AuthProvider>");

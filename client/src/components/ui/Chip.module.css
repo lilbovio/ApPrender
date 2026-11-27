@@ -1,0 +1,71 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  background: var(--surface-soft);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.icon {
+  color: var(--body);
+}
+
+.neutral {
+  background: var(--surface-soft);
+}
+
+.math {
+  background: var(--math-surface);
+}
+
+.math .icon {
+  color: var(--math-ink);
+}
+
+.english {
+  background: var(--english-surface);
+}
+
+.english .icon {
+  color: var(--english-ink);
+}
+
+.butter {
+  background: var(--butter);
+}
+
+.butter .icon {
+  color: var(--butter-ink);
+}
+
+.mint {
+  background: var(--mint);
+}
+
+.mint .icon {
+  color: var(--mint-ink);
+}
+
+.rose {
+  background: var(--rose);
+}
+
+.rose .icon {
+  color: var(--rose-ink);
+}
+
+.accent {
+  background: var(--accent-soft);
+}
+
+.accent .icon {
+  color: var(--accent);
+}

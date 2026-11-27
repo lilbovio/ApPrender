@@ -1,112 +1,129 @@
-.subjectsContainer {
-  min-height: 100vh;
-  background: var(--bg);
-  padding: 20px;
-  padding-bottom: 100px;
+/* Subjects.module.css — "Materias" screen (DESIGN.md sections 4, 7, 12, 14). */
+
+.hero {
+  position: relative;
+  padding-right: 72px;
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 30px;
+.pilo {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.micro {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--body);
+}
+
+/* Mobile: the corner Pilo is 56 px tall and sits over the hero's right edge. Push the tabs below it
+   (hero text ~15 px + 56 px margin = tabs start ~71 px from the hero top, 15 px clear of the Pilo). */
+.tabs {
+  margin-top: calc(var(--s-7) + var(--s-2));
+}
+
+/* Gap between the tab row and the subject chip, at every width. */
+.panel {
+  margin-top: var(--s-4);
+}
+
+/* Tablet and up: the tab row stays 480 px wide so the corner Pilo never sits on it. */
+@media (min-width: 600px) {
+  .tabs {
+    max-width: 480px;
+    margin-top: var(--s-4);
+  }
 }
 
 .title {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--text);
-  margin-bottom: 8px;
+  margin: var(--s-3) 0 0;
+  font-family: var(--font-story);
+  font-size: var(--type-story);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  color: var(--ink);
 }
 
-.subtitle {
+.count {
+  margin: var(--s-2) 0 0;
+  font-family: var(--font-body);
   font-size: 16px;
-  color: var(--text-secondary);
+  line-height: 1.4;
+  color: var(--body);
 }
 
-.grid {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.path {
+  margin-top: var(--s-4);
 }
 
-.subjectCard {
-  background: var(--card);
-  border-radius: var(--radius-xl);
-  padding: 24px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  box-shadow: var(--shadow-md);
-  border-left: 6px solid var(--border);
-  transition: var(--transition);
-  cursor: pointer;
+.body {
+  margin-top: var(--s-4);
 }
 
-.subjectCard.english {
-  border-left-color: var(--primary);
+/* Mobile: one column list, unchanged. */
+.lessons {
+  display: block;
 }
 
-.subjectCard.math {
-  border-left-color: var(--secondary);
+.ctaWrap {
+  margin-top: var(--s-6);
 }
 
-.subjectCard:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+/* Button's fullWidth class sets width; .ctaWrap .cta overrides it on desktop. */
+.cta {
+  max-width: 100%;
 }
 
-.iconWrapper {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background: var(--bg-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 36px;
+.note {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--body);
 }
 
-.subjectCard.english .iconWrapper {
-  background: rgba(124, 58, 237, 0.1);
+.errorWrap {
+  display: grid;
+  gap: var(--s-2);
+  justify-items: start;
 }
 
-.subjectCard.math .iconWrapper {
-  background: rgba(236, 72, 153, 0.1);
+/*
+ * Desktop: lesson rows become cards in a grid.
+ * The doubled class (.lessons.lessons) lifts the selector above LessonRow's own
+ * `.row` and `.row:last-child` rules, which would otherwise win on source order.
+ */
+@media (min-width: 900px) {
+  .lessons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-3);
+  }
+
+  .lessons.lessons > *,
+  .lessons.lessons > *:last-child {
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-md);
+    padding: var(--s-3) var(--s-4);
+    background: var(--surface);
+  }
+
+  /* Desktop CTA keeps its text width and sits left-aligned under the list. */
+  .ctaWrap .cta {
+    width: auto;
+  }
 }
 
-.info {
-  flex: 1;
-}
-
-.subjectName {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--text);
-  margin: 0 0 6px 0;
-}
-
-.subjectDesc {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin: 0 0 12px 0;
-}
-
-.progressContainer {
-  width: 100%;
-  height: 8px;
-  background: var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.progressBar {
-  height: 100%;
-  border-radius: 10px;
-}
-
-.subjectCard.english .progressBar {
-  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-}
-
-.subjectCard.math .progressBar {
-  background: linear-gradient(90deg, var(--secondary) 0%, #f472b6 100%);
+@media (min-width: 1280px) {
+  .lessons {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }

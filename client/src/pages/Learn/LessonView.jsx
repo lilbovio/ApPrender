@@ -1,234 +1,352 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useNavigate, useParams } from "react-router-dom";
 import { apiRequest } from "../../services/api";
-import styles from "./Learn.module.css";
+import { useAuth } from "../../context/AuthContext";
+import { readSecondary } from "../../utils/vakUtils";
+import { SUBJECTS, VAK_CONTENT_KEY, cleanTitle, rememberSubject } from "../../utils/lessonUtils";
+import {
+  emptyResponse,
+  hasResponse,
+  hintFor,
+  isCorrect,
+  normalizeExercise,
+  praiseFor,
+  revealFor,
+  stripEmoji,
+} from "../../utils/exerciseUtils";
+import { Button, Chip, Icon, InlineError, Pilo, ProgressPath, Screen, SegmentedControl } from "../../components/ui";
+import { useShake } from "../../components/ui/useShake";
+import { DUR, EASE_UI } from "../../components/ui/motion";
+import QuizQuestion from "../../components/lessons/QuizQuestion";
+import RewardScreen from "../../components/lessons/RewardScreen";
+import styles from "./LessonView.module.css";
 
-const LessonView = () => {
+/**
+ * Second-wrong reveal. Same look as InlineError, but role="status" so the
+ * answer is announced politely instead of as an alert.
+ */
+function RevealBlock({ text, shakeKey }) {
+  const controls = useShake(shakeKey);
+  return (
+    <motion.div role="status" className={styles.revealBlock} animate={controls}>
+      <p className={styles.blockTitle}>{text}</p>
+    </motion.div>
+  );
+}
+
+const MODALITY_ORDER = ["visual", "auditory", "kinesthetic"];
+const MODALITY_LABEL = { visual: "Mirar", auditory: "Escuchar", kinesthetic: "Hacer" };
+const MODALITY_ICON = { visual: "eye", auditory: "ear", kinesthetic: "hand" };
+
+/** Keeps only modalities whose content has at least one recognised exercise. */
+function buildModalities(lesson) {
+  const result = {};
+  for (const modality of MODALITY_ORDER) {
+    const content = lesson?.content?.[modality];
+    const exercises = Array.isArray(content?.exercises)
+      ? content.exercises.map(normalizeExercise).filter(Boolean)
+      : [];
+    if (exercises.length > 0) {
+      result[modality] = {
+        title: stripEmoji(content.title) || MODALITY_LABEL[modality],
+        description: stripEmoji(content.description),
+        exercises,
+      };
+    }
+  }
+  return result;
+}
+
+// Page-turn between modalities and between exercises. Only opacity under reduced motion.
+const pageVariants = (reduce) => ({
+  enter: (dir) => (reduce ? { opacity: 0 } : { opacity: 0, x: 12 * dir }),
+  center: { opacity: 1, x: 0 },
+  exit: (dir) => (reduce ? { opacity: 0 } : { opacity: 0, x: -12 * dir }),
+});
+
+export default function LessonView() {
   const { lessonId } = useParams();
   const navigate = useNavigate();
+  const reduce = useReducedMotion();
+  const { user } = useAuth();
+
   const [lesson, setLesson] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
-  const [user, setUser] = useState(null);
+  const [status, setStatus] = useState("loading"); // "loading" | "ready" | "error"
+
+  const [stage, setStage] = useState("intro"); // "intro" | "quiz" | "reward"
+  const [chosen, setChosen] = useState(null);
+  const [direction, setDirection] = useState(1);
+
+  const [index, setIndex] = useState(0);
+  const [response, setResponse] = useState(null);
+  const [attempts, setAttempts] = useState(0);
+  const [feedback, setFeedback] = useState(null); // null | "correct" | "wrong" | "reveal"
+  const [shakeKey, setShakeKey] = useState(0);
+  const [firstTry, setFirstTry] = useState(0);
 
   useEffect(() => {
-    const fetchLessonAndUser = async () => {
-      setLoading(true);
-      try {
-        // Fetch lesson data
-        const lessonData = await apiRequest(`/lessons/lesson/${lessonId}`);
-        setLesson(lessonData);
-
-        // Fetch user data to get VAK type
-        const userData = await apiRequest('/users/profile');
-        setUser(userData);
-      } catch (err) {
-        console.error("Error fetching lesson:", err);
-        setError("No se pudo cargar la lección");
-      } finally {
-        setLoading(false);
-      }
+    let cancelled = false;
+    apiRequest(`/lessons/lesson/${lessonId}`)
+      .then((data) => {
+        if (cancelled) return;
+        setLesson(data);
+        setStatus("ready");
+      })
+      .catch(() => {
+        if (!cancelled) setStatus("error");
+      });
+    return () => {
+      cancelled = true;
     };
-
-    fetchLessonAndUser();
   }, [lessonId]);
 
-  const handleAnswerSelect = (exerciseId, answer) => {
-    setUserAnswers(prev => ({
-      ...prev,
-      [exerciseId]: answer
-    }));
+  useEffect(() => {
+    if (lesson?.subject) rememberSubject(lesson.subject);
+  }, [lesson?.subject]);
+
+  const modalities = useMemo(() => (lesson ? buildModalities(lesson) : {}), [lesson]);
+  const availableKeys = MODALITY_ORDER.filter((m) => modalities[m]);
+
+  // Default: the child's VAK profile, then the secondary modality, then the first available one.
+  const primary = VAK_CONTENT_KEY[user?.vakType];
+  const secondary = VAK_CONTENT_KEY[readSecondary(user?._id)];
+  let defaultModality = availableKeys[0] || null;
+  if (primary && modalities[primary]) defaultModality = primary;
+  else if (secondary && modalities[secondary]) defaultModality = secondary;
+
+  const activeModality = chosen && modalities[chosen] ? chosen : defaultModality;
+  const exercises = activeModality ? modalities[activeModality].exercises : [];
+  const total = exercises.length;
+  const current = exercises[index];
+
+  const chooseModality = (next) => {
+    const from = MODALITY_ORDER.indexOf(activeModality);
+    const to = MODALITY_ORDER.indexOf(next);
+    setDirection(to >= from ? 1 : -1);
+    setChosen(next);
   };
 
-  const handleSubmit = async () => {
-    setShowResults(true);
-    
-    // Calculate score
-    const vakContent = getVAKContent();
-    const exercises = vakContent?.exercises || [];
-    let correctCount = 0;
-    
-    exercises.forEach((exercise, index) => {
-      if (userAnswers[index] === exercise.correctAnswer) {
-        correctCount++;
-      }
-    });
+  const startQuiz = () => {
+    setDirection(1);
+    setIndex(0);
+    setResponse(emptyResponse(exercises[0]));
+    setAttempts(0);
+    setFeedback(null);
+    setFirstTry(0);
+    setStage("quiz");
+  };
 
-    const score = exercises.length > 0 ? (correctCount / exercises.length) * 100 : 0;
+  const showQuestion = (nextIndex) => {
+    setIndex(nextIndex);
+    setResponse(emptyResponse(exercises[nextIndex]));
+    setAttempts(0);
+    setFeedback(null);
+  };
 
-    // Submit progress to backend
-    try {
-      await apiRequest('/progress/update', {
-        method: 'POST',
-        body: JSON.stringify({
-          lessonId: lesson._id,
-          subject: lesson.subject,
-          score: score,
-          completed: score >= 70 // Consider completed if score >= 70%
-        })
-      });
-    } catch (err) {
-      console.error("Error updating progress:", err);
+  const handleCheck = () => {
+    if (!current || feedback === "correct" || feedback === "reveal") return;
+    if (isCorrect(current, response)) {
+      if (attempts === 0) setFirstTry((n) => n + 1);
+      setFeedback("correct");
+      return;
+    }
+    setShakeKey((k) => k + 1);
+    if (attempts === 0) {
+      setAttempts(1);
+      setFeedback("wrong");
+    } else {
+      setFeedback("reveal");
     }
   };
 
-  const handleRetry = () => {
-    setUserAnswers({});
-    setShowResults(false);
-    setCurrentExerciseIndex(0);
+  const handleNext = () => {
+    if (index + 1 < total) {
+      setDirection(1);
+      showQuestion(index + 1);
+    } else {
+      setStage("reward");
+    }
   };
 
-  const handleBackToLessons = () => {
-    navigate('/learn');
-  };
+  const isDone = feedback === "correct" || feedback === "reveal";
+  const isLast = index + 1 >= total;
 
-  const getVAKContent = () => {
-    if (!lesson || !user) return null;
-    
-    const vakType = user.vakType || 'visual';
-    return lesson.content[vakType] || lesson.content.visual;
-  };
+  const pageVariantsFor = pageVariants(reduce);
+  const pageTransition = { duration: DUR.screen, ease: EASE_UI };
 
-  if (loading) {
+  if (status === "loading") {
     return (
-      <div className={styles.learnContainer}>
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <p>Cargando lección...</p>
-        </div>
-      </div>
+      <Screen size="lesson" className={styles.page}>
+        <p className={styles.status}>Preparando tu lección…</p>
+      </Screen>
     );
   }
 
-  if (error || !lesson) {
+  if (status === "error" || !defaultModality) {
     return (
-      <div className={styles.learnContainer}>
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <p style={{ color: 'var(--error)' }}>{error || "Lección no encontrada"}</p>
-          <button onClick={handleBackToLessons} className={styles.backButton}>
-            Volver a Lecciones
-          </button>
+      <Screen size="lesson" className={styles.page}>
+        <div className={styles.stack}>
+          <InlineError>Casi. No pudimos abrir esta lección.</InlineError>
+          <Button fullWidth to="/subjects">
+            Volver a mis materias
+          </Button>
         </div>
-      </div>
+      </Screen>
     );
   }
 
-  const vakContent = getVAKContent();
-  const exercises = vakContent?.exercises || [];
+  const subject = SUBJECTS[lesson.subject];
+
+  if (stage === "reward") {
+    return (
+      <Screen size="lesson" className={styles.page}>
+        <RewardScreen
+          lesson={lesson}
+          firstTry={firstTry}
+          total={total}
+          onContinue={() => navigate("/home")}
+          onSeeBadges={() => navigate("/profile#logros")}
+        />
+      </Screen>
+    );
+  }
+
+  if (stage === "quiz") {
+    return (
+      <Screen size="lesson" className={styles.page}>
+        <Pilo size={48} className={styles.pilo} />
+
+        <div className={`${styles.topRow} ${styles.topRowQuiz}`}>
+          <Button variant="quiet" iconLeft="back" ariaLabel="Salir de la lección" onClick={() => setStage("intro")} />
+          <div className={styles.quizMeta}>
+            <Chip tone="neutral" icon={MODALITY_ICON[activeModality]}>
+              {MODALITY_LABEL[activeModality]}
+            </Chip>
+            <span className={styles.counter}>{`${index + 1} / ${total}`}</span>
+          </div>
+        </div>
+
+        <ProgressPath total={total} current={index} label={`Pregunta ${index + 1} de ${total}`} />
+
+        <div className={styles.quizBody}>
+          <AnimatePresence mode="wait" initial={false} custom={direction}>
+            <motion.div
+              key={index}
+              custom={direction}
+              variants={pageVariantsFor}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={pageTransition}
+            >
+              <QuizQuestion
+                exercise={current}
+                modality={activeModality}
+                subject={lesson.subject}
+                response={response}
+                onResponse={setResponse}
+                locked={isDone}
+              />
+            </motion.div>
+          </AnimatePresence>
+
+          <div className={styles.feedback}>
+            {feedback === "correct" && (
+              <div className={styles.okBlock} role="status">
+                <p className={styles.blockTitle}>
+                  <Icon name="check" size={20} />
+                  Muy bien.
+                </p>
+                {current.kind === "choice" && <p>{`La respuesta es ${stripEmoji(current.answer)}.`}</p>}
+                <p>{praiseFor(activeModality)}</p>
+              </div>
+            )}
+            {feedback === "wrong" && (
+              <InlineError shakeKey={shakeKey}>
+                <p className={styles.blockTitle}>Casi. Prueba otra vez.</p>
+                <p>{hintFor(current, activeModality)}</p>
+              </InlineError>
+            )}
+            {feedback === "reveal" && <RevealBlock shakeKey={shakeKey} text={`Casi. ${revealFor(current)}`} />}
+          </div>
+
+          <Button
+            fullWidth
+            disabled={!isDone && !hasResponse(current, response)}
+            onClick={isDone ? handleNext : handleCheck}
+            iconRight={isDone ? "arrow" : undefined}
+          >
+            {isDone ? (isLast ? "Ver mi recompensa" : "Siguiente pregunta") : "Comprobar"}
+          </Button>
+        </div>
+      </Screen>
+    );
+  }
+
+  // Intro: choose how to learn, then start.
+  const defaultLabel = MODALITY_LABEL[defaultModality];
+  const panelKey = activeModality;
 
   return (
-    <div className={styles.lessonViewContainer}>
-      {/* Header */}
-      <div className={styles.lessonHeader}>
-        <button onClick={handleBackToLessons} className={styles.backButton}>
-          ← Volver
-        </button>
-        <div className={styles.lessonHeaderInfo}>
-          <span className={styles.lessonIcon}>{lesson.icon}</span>
+    <Screen size="lesson" className={styles.page}>
+      <Pilo size={56} className={styles.pilo} />
+
+      <div className={`${styles.topRow} ${styles.topRowIntro}`}>
+        <Button variant="quiet" iconLeft="back" ariaLabel="Volver a mis materias" to={`/subjects?subject=${lesson.subject}`} />
+      </div>
+
+      <div className={styles.stack}>
+        {subject && (
           <div>
-            <h1 className={styles.lessonTitle}>{lesson.title}</h1>
-            <p className={styles.lessonDescription}>{lesson.description}</p>
-          </div>
-        </div>
-        <div className={styles.lessonMeta}>
-          <span className={styles.xpBadge}>+{lesson.xp} XP</span>
-        </div>
-      </div>
-
-      {/* Content Section */}
-      <div className={styles.lessonContent}>
-        {vakContent?.explanation && (
-          <div className={styles.explanationSection}>
-            <h2 className={styles.sectionTitle}>📖 Explicación</h2>
-            <div className={styles.explanationText}>
-              {vakContent.explanation}
-            </div>
+            <Chip tone={subject.tone} icon={subject.icon}>
+              {subject.name}
+            </Chip>
           </div>
         )}
 
-        {/* Exercises Section */}
-        {exercises.length > 0 && (
-          <div className={styles.exercisesSection}>
-            <h2 className={styles.sectionTitle}>✏️ Ejercicios</h2>
-            
-            {exercises.map((exercise, index) => (
-              <div key={index} className={styles.exerciseCard}>
-                <div className={styles.exerciseHeader}>
-                  <span className={styles.exerciseNumber}>Ejercicio {index + 1}</span>
-                  {showResults && (
-                    <span className={
-                      userAnswers[index] === exercise.correctAnswer 
-                        ? styles.correctBadge 
-                        : styles.incorrectBadge
-                    }>
-                      {userAnswers[index] === exercise.correctAnswer ? '✓ Correcto' : '✗ Incorrecto'}
-                    </span>
-                  )}
-                </div>
-                
-                <p className={styles.exerciseQuestion}>{exercise.question}</p>
-                
-                <div className={styles.optionsGrid}>
-                  {exercise.options.map((option, optIndex) => (
-                    <button
-                      key={optIndex}
-                      className={`${styles.optionButton} ${
-                        userAnswers[index] === option ? styles.selected : ''
-                      } ${
-                        showResults && option === exercise.correctAnswer 
-                          ? styles.correctOption 
-                          : ''
-                      } ${
-                        showResults && userAnswers[index] === option && option !== exercise.correctAnswer
-                          ? styles.incorrectOption
-                          : ''
-                      }`}
-                      onClick={() => !showResults && handleAnswerSelect(index, option)}
-                      disabled={showResults}
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
+        <h1 className={styles.title}>{cleanTitle(lesson.title)}</h1>
+        {stripEmoji(lesson.description) && <p className={styles.description}>{stripEmoji(lesson.description)}</p>}
 
-                {showResults && exercise.explanation && (
-                  <div className={styles.exerciseExplanation}>
-                    <strong>💡 Explicación:</strong> {exercise.explanation}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+        <p className={styles.micro}>Cómo quieres aprender</p>
+
+        <SegmentedControl
+          idPrefix="mod"
+          ariaLabel="Forma de aprender"
+          value={activeModality}
+          onChange={chooseModality}
+          options={availableKeys.map((m) => ({ value: m, label: MODALITY_LABEL[m] }))}
+        />
+
+        {activeModality === defaultModality && (
+          <p className={styles.hint}>{`Elegimos «${defaultLabel}» por tu superpoder.`}</p>
         )}
 
-        {/* Action Buttons */}
-        <div className={styles.actionButtons}>
-          {!showResults ? (
-            <button 
-              onClick={handleSubmit} 
-              className={styles.submitButton}
-              disabled={Object.keys(userAnswers).length !== exercises.length}
-            >
-              Enviar Respuestas
-            </button>
-          ) : (
-            <div className={styles.resultsActions}>
-              <button onClick={handleRetry} className={styles.retryButton}>
-                🔄 Intentar de Nuevo
-              </button>
-              <button onClick={handleBackToLessons} className={styles.continueButton}>
-                ✓ Continuar
-              </button>
-            </div>
-          )}
-        </div>
+        <AnimatePresence mode="wait" initial={false} custom={direction}>
+          <motion.div
+            key={panelKey}
+            id="mod-panel"
+            role="tabpanel"
+            aria-labelledby={`mod-tab-${panelKey}`}
+            className={styles.panel}
+            custom={direction}
+            variants={pageVariantsFor}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={pageTransition}
+          >
+            <h2 className={styles.panelTitle}>{modalities[panelKey].title}</h2>
+            {modalities[panelKey].description && (
+              <p className={styles.panelBody}>{modalities[panelKey].description}</p>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        <Button fullWidth onClick={startQuiz}>
+          Empezar
+        </Button>
       </div>
-    </div>
+    </Screen>
   );
-};
-
-export default LessonView;
-
-// Made with Bob
+}

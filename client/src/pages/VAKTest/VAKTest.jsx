@@ -1,79 +1,107 @@
 import { useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Button, Pilo, ProgressPath, Screen } from "../../components/ui";
+import { DUR, EASE_UI } from "../../components/ui/motion";
+import { VAK_BANK } from "../../data/vakBank";
+import VAKQuestion from "./VAKQuestion";
 import VAKResult from "./VAKResult";
 import styles from "./VAKTest.module.css";
 
-const questions = [
-  { 
-    id: 1,
-    q: "Cuando estás aprendiendo algo nuevo, prefieres...", 
-    options: [
-      { text: "Ver imágenes, diagramas o leer sobre ello", type: "visual", icon: "👀" },
-      { text: "Que alguien me lo explique o escuchar un audio", type: "auditivo", icon: "👂" },
-      { text: "Hacerlo yo mismo, usar mis manos o moverme", type: "kinestesico", icon: "🖐️" }
-    ]
-  },
-  { 
-    id: 2,
-    q: "Para recordar un número de teléfono, usualmente...", 
-    options: [
-      { text: "Me imagino los números en mi cabeza", type: "visual", icon: "👀" },
-      { text: "Lo repito en voz alta varias veces", type: "auditivo", icon: "👂" },
-      { text: "Hago el movimiento de teclearlo con mis dedos", type: "kinestesico", icon: "🖐️" }
-    ]
-  },
-  { 
-    id: 3,
-    q: "¿Qué haces en tu tiempo libre?", 
-    options: [
-      { text: "Dibujar, leer o ver videos", type: "visual", icon: "👀" },
-      { text: "Escuchar música o platicar con amigos", type: "auditivo", icon: "👂" },
-      { text: "Jugar deportes, correr o construir cosas", type: "kinestesico", icon: "🖐️" }
-    ]
-  },
-];
+const TOTAL = VAK_BANK.length;
 
-const VAKTest = () => {
+// Page turn between questions. Reduced motion keeps only the opacity change.
+function pageTurn(reduce) {
+  if (reduce) {
+    return {
+      initial: { opacity: 0 },
+      animate: { opacity: 1 },
+      exit: { opacity: 0 },
+      transition: { duration: DUR.screen, ease: EASE_UI },
+    };
+  }
+  return {
+    initial: { opacity: 0, x: 12 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -12 },
+    transition: { duration: DUR.screen, ease: EASE_UI },
+  };
+}
+
+/**
+ * VAK survey. Stages: intro -> question (index 0..11) -> result.
+ * answers: array of { questionId, optionId }. Re-answering replaces the entry.
+ */
+export default function VAKTest() {
+  const reduce = useReducedMotion();
+  const [stage, setStage] = useState("intro");
+  const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
-  const [finished, setFinished] = useState(false);
 
-  const handleAnswer = (type) => {
-    const newAnswers = [...answers, type];
-    setAnswers(newAnswers);
+  const question = VAK_BANK[index];
+  const selectedOptionId = answers.find((a) => a.questionId === question?.id)?.optionId ?? null;
 
-    if (newAnswers.length === questions.length) {
-      setFinished(true);
+  const handleAnswer = (optionId) => {
+    const next = [...answers.filter((a) => a.questionId !== question.id), { questionId: question.id, optionId }];
+    setAnswers(next);
+
+    if (index >= TOTAL - 1) {
+      setStage("result");
+    } else {
+      setIndex(index + 1);
     }
   };
 
-  if (finished) return <VAKResult answers={answers} />;
+  const handleBack = () => {
+    if (index > 0) setIndex(index - 1);
+  };
 
-  const currentQuestion = questions[answers.length];
-  const progress = (answers.length / questions.length) * 100;
+  if (stage === "result") {
+    return <VAKResult answers={answers} />;
+  }
+
+  if (stage === "question") {
+    const turn = pageTurn(reduce);
+    return (
+      <Screen size="survey">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={question.id}
+            initial={turn.initial}
+            animate={turn.animate}
+            exit={turn.exit}
+            transition={turn.transition}
+          >
+            <VAKQuestion
+              question={question}
+              index={index}
+              total={TOTAL}
+              selectedOptionId={selectedOptionId}
+              onAnswer={handleAnswer}
+              onBack={handleBack}
+            />
+          </motion.div>
+        </AnimatePresence>
+      </Screen>
+    );
+  }
 
   return (
-    <div className={styles.testContainer}>
-      <div className={styles.progressContainer}>
-        <div className={styles.progressBar} style={{ width: `${progress}%` }} />
-      </div>
-
-      <div className={styles.card}>
-        <h2 className={styles.questionTitle}>{currentQuestion.q}</h2>
-
-        <div className={styles.optionsList}>
-          {currentQuestion.options.map((opt, i) => (
-            <button
-              key={i}
-              className={styles.optionButton}
-              onClick={() => handleAnswer(opt.type)}
-            >
-              <span className={styles.optionIcon}>{opt.icon}</span>
-              <span className={styles.optionText}>{opt.text}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
+    <Screen size="survey">
+      <section className={styles.intro}>
+        <Pilo size={72} label="Pilo" />
+        <h1 className={styles.introTitle}>Vamos a descubrir cómo aprendes mejor</h1>
+        <p className={styles.body}>Son 12 preguntas rápidas, unos 2 minutos. ¡No hay respuestas incorrectas!</p>
+        <ProgressPath total={TOTAL} current={0} label="0 de 12" />
+        <Button
+          fullWidth
+          onClick={() => {
+            setIndex(0);
+            setStage("question");
+          }}
+        >
+          Empezar aventura
+        </Button>
+      </section>
+    </Screen>
   );
-};
-
-export default VAKTest;
+}

@@ -1,365 +1,303 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { motion, useReducedMotion } from "framer-motion";
+import { Link } from "react-router-dom";
 import styles from "./Home.module.css";
-import Layout from "../../components/layout/Layout";
-import { apiRequest } from "../../services/api";
+import {
+  Screen,
+  Pilo,
+  Chip,
+  DashStop,
+  Button,
+  InlineError,
+  BottomNav,
+  Icon,
+  ProgressPath,
+  DUR,
+  EASE_UI,
+  STAGGER,
+} from "../../components/ui";
+import { useAuth } from "../../context/AuthContext";
+import useLearningData from "../../hooks/useLearningData";
+import { computeBadges } from "../../utils/badgeUtils";
+import {
+  SUBJECTS,
+  cleanTitle,
+  completedSet,
+  greetingFor,
+  lastSubject,
+  levelFor,
+  nextLesson,
+  rememberSubject,
+} from "../../utils/lessonUtils";
+import { WEEKLY_GOAL, lessonsThisWeek } from "../../utils/weekUtils";
 
-/**
- * Badge definitions matching server-side
- */
-const ACHIEVEMENT_BADGES = [
-  {
-    id: 1,
-    name: "Primera Victoria",
-    description: "¡Has completado tu primera lección!",
-    icon: "🌟",
-    criteria: { type: "lessons_completed", value: 1 }
-  },
-  {
-    id: 2,
-    name: "Racha Ardiente",
-    description: "¡3 días seguidos aprendiendo!",
-    icon: "🔥",
-    criteria: { type: "streak", value: 3 }
-  },
-  {
-    id: 3,
-    name: "Maestro Matemático",
-    description: "¡Dominaste todas las lecciones de matemáticas!",
-    icon: "🎯",
-    criteria: { type: "subject_completed", value: 5, subject: "math" }
-  },
-  {
-    id: 4,
-    name: "Explorador de Inglés",
-    description: "¡Completaste todas las lecciones de inglés!",
-    icon: "🌍",
-    criteria: { type: "subject_completed", value: 5, subject: "english" }
-  },
-  {
-    id: 5,
-    name: "Súper Estudiante",
-    description: "¡Completaste TODAS las lecciones!",
-    icon: "🏆",
-    criteria: { type: "all_lessons_completed", value: 10 }
+const SUBJECT_KEYS = ["math", "english"];
+const STREAK_DAYS = 7;
+// Star paths stop at 10 visual steps; larger subjects scale proportionally, the label stays exact.
+const STAR_CAP = 10;
+const SHELF_LIMIT = 3;
+
+// Entry motion: opacity + 8 px rise (opacity only under reduced motion).
+function reveal(reduce, delay) {
+  return {
+    initial: reduce ? { opacity: 0 } : { opacity: 0, y: 8 },
+    animate: reduce ? { opacity: 1 } : { opacity: 1, y: 0 },
+    transition: { duration: DUR.screen, ease: EASE_UI, delay },
+  };
+}
+
+function lessonWord(n) {
+  return n === 1 ? "lección" : "lecciones";
+}
+
+/** Maps done/total onto the capped star path. */
+function starSteps(done, total) {
+  if (total > STAR_CAP) {
+    return { total: STAR_CAP, current: Math.round((done / total) * STAR_CAP) };
   }
-];
+  return { total, current: done };
+}
 
-/**
- * Calculate which badges the user has earned
- */
-const calculateEarnedBadges = (totalCompleted, mathCompleted, englishCompleted, mathStreak, englishStreak) => {
-  const maxStreak = Math.max(mathStreak, englishStreak);
-  
-  return ACHIEVEMENT_BADGES.filter(badge => {
-    const { criteria } = badge;
-    
-    switch (criteria.type) {
-      case "lessons_completed":
-        return totalCompleted >= criteria.value;
-      
-      case "streak":
-        return maxStreak >= criteria.value;
-      
-      case "subject_completed":
-        if (criteria.subject === "math") {
-          return mathCompleted >= criteria.value;
-        } else if (criteria.subject === "english") {
-          return englishCompleted >= criteria.value;
-        }
-        return false;
-      
-      case "all_lessons_completed":
-        return totalCompleted >= criteria.value;
-      
-      default:
-        return false;
-    }
-  });
-};
+export default function Home() {
+  const { user } = useAuth();
+  const reduce = useReducedMotion();
+  const { status, lessons, progress, totals, reload } = useLearningData();
 
-/**
- * Home — Dashboard principal con diseño gamificado
- */
-const Home = () => {
-  const navigate = useNavigate();
-  const [user] = useState(() => {
-    const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
-  const [mathProgress, setMathProgress] = useState({ completed: 0, total: 0, percentage: 0 });
-  const [englishProgress, setEnglishProgress] = useState({ completed: 0, total: 0, percentage: 0 });
-  const [stats, setStats] = useState({ xp: 0, streak: 0, level: 1, badges: 0 });
-  const [loading, setLoading] = useState(true);
-  const [earnedBadges, setEarnedBadges] = useState([]);
+  const name = user?.name || "explorador";
+  const preferred = lastSubject();
+  const ready = status === "ready";
 
-  useEffect(() => {
-    const fetchHomeData = async () => {
-      try {
-        // Fetch both math and english lessons and progress
-        const [mathLessonsData, englishLessonsData, mathProgressData, englishProgressData] = await Promise.all([
-          apiRequest("/lessons/math"),
-          apiRequest("/lessons/english"),
-          apiRequest("/progress/math"),
-          apiRequest("/progress/english")
-        ]);
-
-        // Process Math
-        const mathCompletedIds = mathProgressData.completedLessons?.map(l => typeof l === 'object' ? l._id : l) || [];
-        const mathCompleted = mathLessonsData.filter(lesson => mathCompletedIds.includes(lesson._id)).length;
-        const mathTotal = mathLessonsData.length;
-        setMathProgress({
-          completed: mathCompleted,
-          total: mathTotal,
-          percentage: mathTotal > 0 ? Math.round((mathCompleted / mathTotal) * 100) : 0
-        });
-
-        // Process English
-        const englishCompletedIds = englishProgressData.completedLessons?.map(l => typeof l === 'object' ? l._id : l) || [];
-        const englishCompleted = englishLessonsData.filter(lesson => englishCompletedIds.includes(lesson._id)).length;
-        const englishTotal = englishLessonsData.length;
-        setEnglishProgress({
-          completed: englishCompleted,
-          total: englishTotal,
-          percentage: englishTotal > 0 ? Math.round((englishCompleted / englishTotal) * 100) : 0
-        });
-
-        // Calculate combined stats
-        const totalXP = (mathProgressData.xp || 0) + (englishProgressData.xp || 0);
-        const totalCompleted = mathCompleted + englishCompleted;
-        const totalLessons = 10; // 5 Math + 5 English
-        
-        // NEW: Level based on lesson completion (1 level per 2 lessons)
-        const currentLevel = Math.floor(totalCompleted / 2) + 1; // Levels 1-6
-        
-        // Calculate badges earned
-        const badges = calculateEarnedBadges(totalCompleted, mathCompleted, englishCompleted, mathProgressData.streak, englishProgressData.streak);
-        
-        setStats({
-          xp: totalXP,
-          streak: Math.max(mathProgressData.streak || 0, englishProgressData.streak || 0),
-          level: currentLevel,
-          badges: badges.length,
-          totalLessons,
-          totalCompleted,
-          level: Math.floor(totalXP / 200) + 1, // Simple level calculation
-          badges: Math.floor(totalCompleted / 5), // 1 badge per 5 lessons
-          mathCompleted,
-          englishCompleted
-        });
-        
-        setEarnedBadges(badges);
-      } catch (error) {
-        console.error("Error fetching home data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchHomeData();
-  }, []);
-
-  const handleSubjectClick = (subject) => {
-    navigate(`/subjects?subject=${subject}`);
-  };
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "¡Buenos días";
-    if (hour < 18) return "¡Buenas tardes";
-    return "¡Buenas noches";
-  };
-
-  // NEW: Level progress based on lessons completed (not XP)
-  const totalLessons = 10; // 5 Math + 5 English
-  const totalCompleted = mathProgress.completed + englishProgress.completed;
-  const lessonsInCurrentLevel = totalCompleted % 2; // 2 lessons per level
-  const levelProgress = (lessonsInCurrentLevel / 2) * 100; // Progress to next level (0-100%)
-  const nextLevelAt = (Math.floor(totalCompleted / 2) + 1) * 2; // Next level milestone
-
-  if (loading) {
-    return (
-      <Layout user={user} stats={stats}>
-        <div className={styles.loading}>Cargando...</div>
-      </Layout>
+  // Continue with the last subject; fall back to the other one if it has no pending lesson.
+  let next = null;
+  let completedCount = 0;
+  if (ready) {
+    completedCount = SUBJECT_KEYS.reduce(
+      (sum, key) => sum + (progress[key]?.completedLessons?.length || 0),
+      0
     );
+    const order = [preferred, preferred === "math" ? "english" : "math"];
+    for (const key of order) {
+      const lesson = nextLesson(lessons[key], progress[key]);
+      if (lesson) {
+        next = { subject: key, lesson };
+        break;
+      }
+    }
   }
+
+  const streakDays = Math.min(totals.streak, STREAK_DAYS);
+  const streakLabel = `${streakDays} de ${STREAK_DAYS} días`;
+
+  const earned = ready
+    ? computeBadges({ lessons, progress, totals })
+        .filter((badge) => badge.earned)
+        .slice(0, SHELF_LIMIT)
+    : [];
+
+  const weekCount = ready ? lessonsThisWeek(user?._id) : 0;
+  const weekShown = Math.min(weekCount, WEEKLY_GOAL);
+  const weekLabel = `${weekShown} de ${WEEKLY_GOAL} lecciones esta semana`;
+
+  const primaryStop = (() => {
+    if (status === "loading") {
+      return (
+        <DashStop
+          busy
+          primary
+          number={1}
+          title="Preparando tu camino…"
+        />
+      );
+    }
+    if (status === "error") {
+      return (
+        <div className={styles.errorWrap}>
+          <InlineError>Casi. No pudimos cargar tu camino. Revisa tu conexión.</InlineError>
+          <Button variant="quiet" onClick={reload}>
+            Intentar otra vez
+          </Button>
+        </div>
+      );
+    }
+    if (next) {
+      // DESIGN.md §7: a child who has not finished anything yet gets a first action, not "continue".
+      const isFirst = completedCount === 0;
+      return (
+        <DashStop
+          to={`/learn/lesson/${next.lesson._id}`}
+          primary
+          number={1}
+          icon="arrow"
+          title={isFirst ? "Empieza tu primera lección" : "Continuar donde lo dejé"}
+          meta={`${cleanTitle(next.lesson.title)} · ${SUBJECTS[next.subject].name}`}
+          onClick={() => rememberSubject(next.subject)}
+        />
+      );
+    }
+    if (completedCount === 0) {
+      // No lessons available and nothing completed: never celebrate completion (DESIGN.md §7).
+      return (
+        <DashStop
+          to="/subjects"
+          primary
+          number={1}
+          icon="arrow"
+          title="Elige tu primera lección"
+          meta="Mira qué hay en Matemáticas e Inglés"
+        />
+      );
+    }
+    return (
+      <DashStop
+        to="/subjects"
+        primary
+        number={1}
+        icon="arrow"
+        title="Repasar una lección"
+        meta="Ya terminaste todo. ¡Qué bien!"
+      />
+    );
+  })();
 
   return (
-    <Layout user={user} stats={stats}>
-      <div className={styles.homeContainer}>
-        {/* Decorative Clouds */}
-        <div className={styles.cloud1}></div>
-        <div className={styles.cloud2}></div>
-        <div className={styles.cloud3}></div>
+    <>
+      <Screen withNav>
+        <header className={styles.hero}>
+          <Pilo size={56} className={styles.pilo} />
+          <p className={styles.micro}>Mi espacio</p>
+          <h1 className={styles.title}>{`¡${greetingFor()}, ${name}!`}</h1>
+        </header>
 
-        <div className={styles.contentWrapper}>
-        {/* Hero Banner */}
-        <div className={styles.heroBanner}>
-          <div className={styles.heroContent}>
-            <h1>{getGreeting()}, {user?.name || "Estudiante"}!</h1>
-            <p>¿Listo para descubrir cosas asombrosas hoy?</p>
-            <button
-              className={styles.specialMissionBtn}
-              onClick={() => navigate("/learn")}
-            >
-              🚀 Iniciar Misión Especial
-            </button>
-          </div>
-          <div className={styles.heroAvatar}>
-            {user?.avatar ? (
-              <img src={user.avatar} alt="Avatar" />
-            ) : (
-              "🤖"
+        <div className={styles.chips} aria-hidden={!ready || undefined}>
+          {ready && (
+            <>
+              {totals.streak > 0 ? (
+                <Chip tone="butter" icon="star">
+                  {`${totals.streak} ${totals.streak === 1 ? "día" : "días"} de racha`}
+                </Chip>
+              ) : (
+                <Chip>Hoy empieza tu racha</Chip>
+              )}
+              <Chip tone="mint">{`${totals.xp} XP`}</Chip>
+              <Chip tone="accent" icon="medal">
+                {`Nivel ${levelFor(totals.xp)}`}
+              </Chip>
+            </>
+          )}
+        </div>
+
+        {ready && (
+          <div className={styles.streak}>
+            <p className={styles.micro}>Tu racha</p>
+            <ProgressPath
+              variant="stars"
+              total={STREAK_DAYS}
+              current={streakDays}
+              label={streakLabel}
+              className={styles.streakPath}
+            />
+            {totals.streak === 0 && (
+              <p className={styles.support}>Aprende hoy y enciende la primera estrella.</p>
             )}
           </div>
-        </div>
+        )}
 
-        {/* Level Progress Bar */}
-        <div className={styles.levelCard}>
-          <div className={styles.levelHeader}>
-            <div className={styles.levelInfo}>
-              <span className={styles.levelLabel}>Nivel {stats.level}</span>
-              <span className={styles.xpText}>
-                {totalCompleted} / {totalLessons} lecciones
-              </span>
-            </div>
-            <div className={styles.streakBadge}>
-              🔥 {stats.streak} días
-            </div>
-          </div>
-          <div className={styles.levelBarContainer}>
-            <div
-              className={styles.levelBarFill}
-              style={{ width: `${levelProgress}%` }}
-            >
-              <span className={styles.levelBarText}>
-                {totalCompleted < totalLessons
-                  ? `${nextLevelAt - totalCompleted} lecciones para nivel ${stats.level + 1}`
-                  : "¡Nivel máximo!"}
-              </span>
-            </div>
-          </div>
-        </div>
+        <div className={styles.path}>
+          <section className={styles.section} aria-labelledby="camino-hoy">
+            <p className={styles.micro} id="camino-hoy">
+              Tu camino de hoy
+            </p>
+            <motion.div className={styles.stopWrap} {...reveal(reduce, 0)}>
+              {primaryStop}
+            </motion.div>
+          </section>
 
-        {/* Daily Mission */}
-        <div className={styles.dailyMission}>
-          <div className={styles.missionIcon}>💻</div>
-          <div className={styles.missionContent}>
-            <h3>Misión del día 🎯</h3>
-            <p>¿Listo para el desafío de hoy? ¡Repasa vocabulario y suma racha!</p>
-          </div>
-          <button className={styles.acceptBtn}>ACEPTAR</button>
-        </div>
-
-        {/* Subjects Section */}
-        <h2 className={styles.sectionTitle}>Tus Materias</h2>
-        <div className={styles.subjectsGrid}>
-          {/* Math Card */}
-          <div
-            className={`${styles.subjectCard} ${styles.math}`}
-            onClick={() => handleSubjectClick("math")}
-          >
-            <div className={styles.subjectHeader}>
-              <div className={styles.subjectIconBox}>🔢</div>
-              <div className={styles.subjectInfo}>
-                <h3>Matemáticas</h3>
-                <div className={styles.subjectPercentage}>{mathProgress.percentage}%</div>
-              </div>
-            </div>
-            <div className={styles.subjectProgressBar}>
-              <div
-                className={styles.subjectProgressFill}
-                style={{ width: `${mathProgress.percentage}%` }}
-              ></div>
-            </div>
-            <div className={styles.subjectDetails}>
-              {mathProgress.completed} de {mathProgress.total} lecciones
-            </div>
-            <button className={styles.learnBtn}>
-              ¡Aprender! →
-            </button>
-          </div>
-
-          {/* English Card */}
-          <div
-            className={`${styles.subjectCard} ${styles.english}`}
-            onClick={() => handleSubjectClick("english")}
-          >
-            <div className={styles.subjectHeader}>
-              <div className={styles.subjectIconBox}>🌍</div>
-              <div className={styles.subjectInfo}>
-                <h3>Inglés</h3>
-                <div className={styles.subjectPercentage}>{englishProgress.percentage}%</div>
-              </div>
-            </div>
-            <div className={styles.subjectProgressBar}>
-              <div
-                className={styles.subjectProgressFill}
-                style={{ width: `${englishProgress.percentage}%` }}
-              ></div>
-            </div>
-            <div className={styles.subjectDetails}>
-              {englishProgress.completed} de {englishProgress.total} lecciones
-            </div>
-            <button className={styles.learnBtn}>
-              Practicar →
-            </button>
-          </div>
-        </div>
-
-        {/* Badges Section */}
-        <div className={styles.badgesSection}>
-          <div className={styles.badgesHeader}>
-            <h2 className={styles.sectionTitle}>Tus Insignias</h2>
-            <div
-              className={styles.viewAll}
-              onClick={() => navigate("/profile")}
-            >
-              Ver catálogo completo
-            </div>
-          </div>
-          <div className={styles.badgesGrid}>
-            {ACHIEVEMENT_BADGES.map((badge) => {
-              const isUnlocked = earnedBadges.some(b => b.id === badge.id);
+          <div className={styles.doors}>
+            {SUBJECT_KEYS.map((key, index) => {
+              const subject = SUBJECTS[key];
+              const total = lessons[key].length;
+              const done = Math.min(completedSet(progress[key]).size, total);
+              const doneText = `${done} de ${total} ${lessonWord(total)}`;
+              const steps = starSteps(done, total);
               return (
-                <div
-                  key={badge.id}
-                  className={`${styles.badgeItem} ${!isUnlocked ? styles.locked : ''}`}
-                  title={isUnlocked ? badge.description : "🔒 Bloqueado"}
-                >
-                  {isUnlocked && <div className={styles.badgeCheck}>✓</div>}
-                  <span className={styles.badgeEmoji}>
-                    {isUnlocked ? badge.icon : "❌"}
-                  </span>
-                  <div className={styles.badgeName}>
-                    {isUnlocked ? badge.name : "???"}
-                  </div>
-                </div>
+                <motion.div key={key} {...reveal(reduce, STAGGER * (index + 1))}>
+                  <Link
+                    to={`/subjects?subject=${key}`}
+                    className={styles.door}
+                    onClick={() => rememberSubject(key)}
+                  >
+                    <Icon
+                      name={subject.icon}
+                      size={34}
+                      className={key === "math" ? styles.iconMath : styles.iconEnglish}
+                    />
+                    <span className={styles.doorName}>{subject.name}</span>
+                    {ready && total > 0 && (
+                      // Decorative: the visible count below already names the link (no double read).
+                      <div aria-hidden="true">
+                        <ProgressPath
+                          variant="stars"
+                          total={steps.total}
+                          current={steps.current}
+                          label={doneText}
+                          className={styles.doorPath}
+                        />
+                      </div>
+                    )}
+                    {ready && <span className={styles.support}>{doneText}</span>}
+                  </Link>
+                </motion.div>
               );
             })}
           </div>
         </div>
 
-        {/* Weekly Goal Widget */}
-        <div className={styles.weeklyGoal}>
-          <h3>🎯 Meta de la semana</h3>
-          <p>¡Completa 2 misiones más para abrir el cofre mágico!</p>
-          <div className={styles.weeklyProgress}>
-            <span>PROGRESO</span>
-            <span>{Math.min(mathProgress.completed + englishProgress.completed, 5)}/5</span>
-          </div>
-          <div className={styles.weeklyBar}>
-            <div
-              className={styles.weeklyBarFill}
-              style={{ width: `${Math.min((mathProgress.completed + englishProgress.completed) / 5 * 100, 100)}%` }}
-            ></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    </Layout>
-  );
-};
+        {ready && (
+          <div className={styles.lower}>
+            <section className={styles.panel} aria-labelledby="trofeos">
+              <h2 id="trofeos" className={styles.shelfTitle}>
+                Mis trofeos
+              </h2>
+              {earned.length > 0 ? (
+                <ul className={styles.trophies}>
+                  {earned.map((badge) => (
+                    <li key={badge.id} className={styles.trophy}>
+                      <span className={styles.tile}>
+                        <Icon name={badge.icon} size={24} />
+                      </span>
+                      <span className={styles.trophyName}>{badge.title}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={styles.support}>Termina una lección para ganar tu primera insignia.</p>
+              )}
+              <Link to="/profile#logros" className={styles.viewAll}>
+                Ver todas
+              </Link>
+            </section>
 
-export default Home;
+            {weekCount > 0 && (
+              <section className={styles.panel} aria-labelledby="meta-semana">
+                <p className={styles.micro} id="meta-semana">
+                  Meta de la semana
+                </p>
+                <ProgressPath
+                  variant="dots"
+                  total={WEEKLY_GOAL}
+                  current={weekShown}
+                  label={weekLabel}
+                  className={styles.weekPath}
+                />
+                {/* Visual caption only; the progressbar above carries the same text for screen readers. */}
+                <p className={styles.support} aria-hidden="true">
+                  {weekLabel}
+                </p>
+              </section>
+            )}
+          </div>
+        )}
+      </Screen>
+      <BottomNav />
+    </>
+  );
+}

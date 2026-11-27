@@ -1,217 +1,181 @@
-@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+/* ApPrender design tokens — source of truth: DESIGN.md sections 2, 3, 4, 6.
+   Do not add legacy values here (see CLAUDE.md). */
 
 :root {
-  /* Colores Primarios - Amigables para niños */
-  --primary: #7C3AED;           /* Púrpura vibrante (principal) */
-  --primary-light: #a855f7;     /* Púrpura claro */
-  --primary-dark: #6d28d9;      /* Púrpura oscuro */
-  
-  /* Colores Secundarios */
-  --secondary: #ec4899;         /* Rosa/Magenta brillante */
-  --accent: #06b6d4;            /* Cyan/Turquesa */
-  --accent-light: #22d3ee;      /* Cyan claro */
-  
-  /* Colores de Soporte */
-  --success: #10b981;           /* Verde éxito */
-  --warning: #f59e0b;           /* Ámbar/Naranja */
-  --error: #ef4444;             /* Rojo error */
-  --info: #3b82f6;              /* Azul información */
-  
-  /* Colores por Materia */
-  --english: #7C3AED;           /* Inglés - Púrpura */
-  --math: #ec4899;              /* Matemáticas - Rosa */
-  
-  /* Fondos y Grises */
-  --bg: #f8fafc;                /* Fondo principal - azul muy claro */
-  --bg-secondary: #f1f5f9;      /* Fondo secundario */
-  --card: #ffffff;              /* Fondo tarjetas */
-  --card-hover: #f8fafc;        /* Card hover */
-  --hover: #f0f9ff;             /* Hover estado */
-  
-  /* Textos */
-  --text: #1e293b;              /* Texto principal - azul oscuro */
-  --text-secondary: #64748b;    /* Texto secundario - gris */
-  --text-muted: #94a3b8;        /* Texto deshabilitado - gris claro */
-  
-  /* Bordes */
-  --border: #e2e8f0;            /* Borde estándar */
-  --border-light: #f1f5f9;      /* Borde claro */
-  
-  /* Sombras */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-  
-  /* Espaciado */
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  
-  /* Tipografía */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  --font-size-sm: 12px;
-  --font-size-base: 14px;
-  --font-size-md: 16px;
-  --font-size-lg: 18px;
-  --font-size-xl: 24px;
-  --font-size-2xl: 32px;
-  
-  /* Transiciones */
-  --transition: all 0.3s ease;
-  --transition-fast: all 0.15s ease;
-  --transition-slow: all 0.6s ease;
+  /* Color: paper and ink */
+  --canvas: #FBF7F1;
+  --canvas-alt: #F3EDF7;
+  --surface: #FFFFFF;
+  --surface-soft: #F7F3FB;
+  --hairline: #E4DCEA;
+  --ink: #2E2A44;
+  --body: #4A465F;
+  --muted: #77728B;
+
+  /* Color: action (grape) and reward (coral) */
+  --accent: #6B4CA8;
+  --accent-hover: #7E5CBD;
+  --accent-soft: #E7DEF7;
+  --on-accent: #FFFFFF;
+  --celebration: #E8895F;
+  --celebration-soft: #FFE2D2;
+
+  /* Color: story surfaces (pastel, ink text on top) */
+  --math-surface: #F6D9C2;
+  --math-ink: #A85E35;
+  --english-surface: #DFD2F4;
+  --english-ink: #5E42A0;
+  --mint: #CFE8DC;
+  --sky: #D9EAF7;
+  --rose: #F6D9E4;
+  --butter: #F7E4B4;
+
+  /* Color: status */
+  --success: #5E9C7A;
+  --error: #C46A6A;
+  --error-soft: #F8DEDE;
+
+  /* Derived text inks for tones (contrast-checked, text on pastel) */
+  --butter-ink: #7A5A12;
+  --mint-ink: #356B56;
+  --rose-ink: #8F506B;
+  --error-ink: #8F4343;
+
+  /* Radius scale (never 16 / 24 / 32) */
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --r-pill: 9999px;
+
+  /* Spacing (4 px base) and gutter */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 80px;
+  --gutter: 20px;
+
+  /* Responsive shell (DESIGN.md section 14). Mobile values; overridden per breakpoint below. */
+  --content-max: 480px;
+  --rail-width: 240px;
+
+  /* Type scale by breakpoint (DESIGN.md section 14) */
+  --type-story: 32px;
+  --type-ui: 18px;
+  --type-body: 17px;
+
+  /* Typography families */
+  --font-story: 'Fraunces', Georgia, serif;
+  --font-ui: 'Fredoka', 'Nunito', sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+
+  /* Motion */
+  --ease-ui: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-joy: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-micro: 180ms;
+  --dur-screen: 280ms;
+  --dur-joy: 520ms;
+
+  /* Elevation: only the reward sticker / floating mascot */
+  --sticker-shadow: 0 12px 30px rgba(46, 42, 68, 0.10);
 }
 
-/* Dark Mode - Cozy & Child-Friendly */
-[data-theme="dark"] {
-  /* Colores Primarios - Más brillantes para visibilidad */
-  --primary: #9d6fff;           /* Púrpura más claro */
-  --primary-light: #b794ff;     /* Púrpura muy claro */
-  --primary-dark: #8b5cf6;      /* Púrpura medio */
-  
-  /* Colores Secundarios - Vibrantes */
-  --secondary: #ff5eb8;         /* Rosa más brillante */
-  --accent: #22d3ee;            /* Cyan brillante */
-  --accent-light: #67e8f9;      /* Cyan muy claro */
-  
-  /* Colores de Soporte - Brillantes */
-  --success: #34d399;           /* Verde brillante */
-  --warning: #fbbf24;           /* Ámbar brillante */
-  --error: #f87171;             /* Rojo brillante */
-  --info: #60a5fa;              /* Azul brillante */
-  
-  /* Colores por Materia - Ajustados */
-  --english: #9d6fff;           /* Inglés - Púrpura claro */
-  --math: #ff5eb8;              /* Matemáticas - Rosa brillante */
-  
-  /* Fondos - Cozy navy blues */
-  --bg: #1a1f35;                /* Fondo principal - navy profundo */
-  --bg-secondary: #242b45;      /* Fondo secundario - navy medio */
-  --card: #2d3548;              /* Tarjetas - gris-azul cálido */
-  --card-hover: #353d56;        /* Card hover - más claro */
-  --hover: #353d56;             /* Hover estado */
-  
-  /* Textos - Suaves, no harsh */
-  --text: #e8eaf0;              /* Texto principal - blanco suave */
-  --text-secondary: #b8bcc8;    /* Texto secundario - gris claro */
-  --text-muted: #8a8f9f;        /* Texto deshabilitado - gris medio */
-  
-  /* Bordes - Sutiles */
-  --border: #3d4560;            /* Borde estándar */
-  --border-light: #353d56;      /* Borde claro */
-  
-  /* Sombras - Más profundas con glow sutil */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+/* Breakpoints: mobile 0-599, tablet 600-899, desktop 900-1279, wide 1280+ */
+@media (min-width: 600px) {
+  :root {
+    --content-max: 720px;
+    --gutter: 24px;
+    --type-story: 40px;
+    --type-ui: 20px;
+  }
 }
 
-/* Reset Global */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@media (min-width: 900px) {
+  :root {
+    --content-max: 1120px;
+    --gutter: 32px;
+    --type-story: 48px;
+    --type-body: 18px;
+  }
 }
 
-*::before,
-*::after {
-  box-sizing: border-box;
+@media (min-width: 1280px) {
+  :root {
+    --content-max: 1200px;
+  }
 }
 
-/* Body */
-body {
-  font-family: var(--font-family);
-  background-color: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* Smooth transitions for theme switching */
+/* Base */
 *,
 *::before,
 *::after {
-  transition: background-color 0.3s ease,
-              color 0.3s ease,
-              border-color 0.3s ease,
-              box-shadow 0.3s ease,
-              fill 0.3s ease,
-              stroke 0.3s ease;
+  box-sizing: border-box;
 }
 
-/* Exclude transform and position from transitions */
-* {
-  transition-property: background-color, color, border-color, box-shadow, fill, stroke;
+/* Safety net only: every layout must still fit on its own. */
+html,
+body {
+  overflow-x: clip;
 }
 
-/* Links */
-a {
-  text-decoration: none;
-  color: inherit;
-  transition: var(--transition);
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--type-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Botones */
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
-  padding: 0;
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--font-story);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
 }
 
-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
+p {
+  margin: 0;
 }
 
-/* Inputs */
+button,
 input,
 textarea,
 select {
-  font-family: inherit;
-  font-size: inherit;
+  font: inherit;
 }
 
-/* Imágenes */
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 img {
   max-width: 100%;
-  display: block;
   height: auto;
+  display: block;
 }
 
-/* Scrollbar personalizado */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: var(--radius-lg);
-  transition: var(--transition);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
-}
-
-/* Utilidades básicas */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
+/* Utilities */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -222,4 +186,15 @@ img {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+/* Reduced motion: keep state changes, drop long or looping animation */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
 }

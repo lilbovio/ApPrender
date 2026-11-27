@@ -1,30 +1,21 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 
-import Login from "./pages/Auth/Login";
-import Register from "./pages/Auth/Register";
+import { useAuth } from "./context/AuthContext";
+import AuthSurface from "./pages/Auth/AuthSurface";
 import Home from "./pages/Home/Home";
 import Learn from "./pages/Learn/Learn";
 import LessonView from "./pages/Learn/LessonView";
 import Profile from "./pages/Profile/Profile";
 import VAKTest from "./pages/VAKTest/VAKTest";
-import ThemeToggle from "./components/common/ThemeToggle";
 import Subjects from "./pages/Subjects/Subjects";
+import Landing from "./pages/Landing/Landing";
 
-/**
- * ProtectedRoute — Simula protección sin backend real
- * Si no hay token en localStorage, redirige a login
- */
 function ProtectedRoute({ element }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
-  }, []);
-
-  if (isAuthenticated === null) return <div>Cargando...</div>;
-  return isAuthenticated ? element : <Navigate to="/" />;
+  const { isAuthenticated, hasVAKType } = useAuth();
+  const location = useLocation();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!hasVAKType && location.pathname !== "/vak") return <Navigate to="/vak" replace />;
+  return element;
 }
 
 // Un componente wrapper para usar useLocation
@@ -33,9 +24,9 @@ function AppContent() {
     <>
       <Routes>
         {/* Auth routes */}
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<AuthSurface mode="login" />} />
+        <Route path="/register" element={<AuthSurface mode="register" />} />
 
         {/* Protected routes */}
         <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
@@ -48,9 +39,6 @@ function AppContent() {
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-      
-      {/* Dark Mode Toggle - Fixed position top-right */}
-      <ThemeToggle />
     </>
   );
 }

@@ -1,0 +1,120 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-bottom: var(--s-5);
+}
+
+/* Mobile: single column, the card is capped at 460 px by Screen size="auth".
+   >= 900 px: form left, notes right, inside the 960 px shell. */
+.layout {
+  display: block;
+}
+
+.main {
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-story);
+  font-size: min(var(--type-story), 40px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.support {
+  margin: var(--s-2) 0 0;
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--body);
+}
+
+.modes {
+  margin: var(--s-5) 0;
+}
+
+.card {
+  padding: 24px 20px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+}
+
+.cardHead {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--s-3);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.avatarBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.micro {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--body);
+}
+
+/* Notes: desktop only. Hairline cards, no shadow. */
+.notes {
+  display: none;
+}
+
+.note {
+  padding: var(--s-5);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+}
+
+.noteTitle {
+  margin: 0;
+  font-family: var(--font-story);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.noteBody {
+  margin: var(--s-2) 0 0;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--body);
+}
+
+@media (min-width: 900px) {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: var(--s-6);
+    align-items: start;
+  }
+
+  .notes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    padding-top: var(--s-6);
+  }
+}

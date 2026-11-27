@@ -1,0 +1,36 @@
+.track {
+  display: flex;
+  gap: var(--s-1);
+  padding: var(--s-1);
+  background: var(--surface-soft);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+}
+
+.option {
+  flex: 1;
+  min-height: 48px;
+  padding: 0 var(--s-3);
+  border: 0;
+  border-radius: var(--r-xs);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-micro) var(--ease-ui),
+    color var(--dur-micro) var(--ease-ui);
+}
+
+.option[aria-selected="true"] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.option:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}

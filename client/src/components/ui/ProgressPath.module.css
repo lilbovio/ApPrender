@@ -1,0 +1,46 @@
+.path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+/* Transition is declared on both states so the lit change animates. */
+.dot,
+.dotLit {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--hairline);
+  transition:
+    background-color var(--dur-micro) var(--ease-ui),
+    border-color var(--dur-micro) var(--ease-ui);
+}
+
+.dot {
+  background: var(--surface);
+}
+
+.dotLit {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.starUnlit,
+.starLit {
+  display: inline-flex;
+  transition: color var(--dur-micro) var(--ease-ui);
+}
+
+.starUnlit {
+  color: var(--muted);
+}
+
+.starLit {
+  color: var(--accent);
+}
+
+.starLit svg {
+  fill: currentColor;
+}

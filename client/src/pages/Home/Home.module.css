@@ -1,826 +1,297 @@
-/* Home.module.css — Gamified Dashboard Design */
+/* Home.module.css — "Tu camino de hoy" dashboard (DESIGN.md sections 12, 14, 15). */
 
-.homeContainer {
-  min-height: calc(100vh - 110px);
-  background: linear-gradient(180deg, #87CEEB 0%, #98D8C8 100%);
-  padding: 0;
+.hero {
   position: relative;
-  overflow-x: hidden;
-  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive;
+  padding-right: 72px;
 }
 
-/* Dark mode background */
-[data-theme="dark"] .homeContainer {
-  background: linear-gradient(180deg, #1a1f35 0%, #242b45 100%);
-}
-
-/* Loading State */
-.loading {
-  text-align: center;
-  padding: 40px;
-  font-size: 18px;
-  color: var(--text);
-}
-
-/* Decorative Clouds */
-.cloud1,
-.cloud2,
-.cloud3 {
+.pilo {
   position: absolute;
-  background: white;
-  border-radius: 100px;
-  opacity: 0.5;
-  animation: float 20s infinite ease-in-out;
-  pointer-events: none;
+  top: 0;
+  right: 0;
+  transform: scaleX(-1);
 }
 
-/* Clouds in dark mode - more subtle */
-[data-theme="dark"] .cloud1,
-[data-theme="dark"] .cloud2,
-[data-theme="dark"] .cloud3 {
-  opacity: 0.15;
-}
-
-.cloud1 {
-  width: 100px;
-  height: 40px;
-  top: 50px;
-  left: 10%;
-}
-
-.cloud2 {
-  width: 150px;
-  height: 60px;
-  top: 150px;
-  right: 15%;
-  animation-delay: -5s;
-}
-
-.cloud3 {
-  width: 120px;
-  height: 50px;
-  top: 400px;
-  left: 70%;
-  animation-delay: -10s;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-.contentWrapper {
-  max-width: 100%;
+.micro {
   margin: 0;
-  padding: 0;
-  position: relative;
-  z-index: 1;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--body);
 }
 
-/* Hero Banner */
-.heroBanner {
-  background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);
-  border-radius: 25px;
-  padding: 40px;
-  margin: 20px;
-  margin-bottom: 25px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 5px solid white;
-  position: relative;
-  overflow: hidden;
-}
-
-[data-theme="dark"] .heroBanner {
-  background: linear-gradient(135deg, #353d56 0%, #2d3548 100%);
-  border-color: var(--border);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-}
-
-.heroBanner::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -10%;
-  width: 300px;
-  height: 300px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 50%;
-}
-
-[data-theme="dark"] .heroBanner::before {
-  background: rgba(157, 111, 255, 0.1);
-}
-
-.heroContent {
-  position: relative;
-  z-index: 1;
-  flex: 1;
-}
-
-.heroContent h1 {
-  font-size: 48px;
-  color: white;
-  margin-bottom: 10px;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-}
-
-.heroContent p {
-  font-size: 20px;
-  color: rgba(255,255,255,0.9);
-  margin-bottom: 25px;
-}
-
-.specialMissionBtn {
-  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-  color: #1a1a1a;
-  border: none;
-  padding: 15px 35px;
-  border-radius: 30px;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
-  transition: all 0.3s ease;
-  font-family: inherit;
-}
-
-.specialMissionBtn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(255, 215, 0, 0.6);
-}
-
-.heroAvatar {
-  width: 150px;
-  height: 150px;
-  background: rgba(0,0,0,0.3);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 80px;
-  border: 5px solid white;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  position: relative;
-  z-index: 1;
-  flex-shrink: 0;
-}
-
-.heroAvatar img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-/* Level Card */
-.levelCard {
-  background: var(--card);
-  border-radius: 20px;
-  padding: 20px 25px;
-  margin-bottom: 25px;
-  box-shadow: var(--shadow-lg);
-  border: 3px solid var(--warning);
-  margin: 0 20px 25px 20px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-  border: 3px solid #FFD700;
-}
-
-.levelHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.levelInfo {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.levelLabel {
-  font-size: 20px;
-  font-weight: bold;
-  color: var(--text);
-}
-
-.xpText {
-  font-size: 16px;
-  color: var(--text-secondary);
-}
-
-.streakBadge {
-  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 16px;
-  font-weight: bold;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-}
-
-.levelBarContainer {
-  background: var(--bg-secondary);
-  height: 30px;
-  border-radius: 15px;
-  overflow: hidden;
-  position: relative;
-}
-
-[data-theme="dark"] .levelBarContainer {
-  background: var(--border);
-}
-
-.levelBarFill {
-  background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
+.support {
+  margin: 0;
+  font-family: var(--font-body);
   font-size: 14px;
-  color: #333;
-  transition: width 0.5s ease;
-  animation: pulse 2s infinite;
+  line-height: 1.5;
+  color: var(--body);
 }
 
-[data-theme="dark"] .levelBarFill {
-  background: linear-gradient(90deg, var(--warning) 0%, #FFA500 100%);
-  color: #1a1a1a;
+.title {
+  margin: var(--s-1) 0 0;
+  font-family: var(--font-story);
+  font-size: var(--type-story);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  text-align: left;
+  overflow-wrap: anywhere;
+  color: var(--ink);
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
-.levelBarText {
-  position: relative;
-  z-index: 1;
-}
-
-/* Notification Card */
-.notificationCard {
-  background: var(--card);
-  border-radius: 20px;
-  padding: 20px 25px;
-  margin-bottom: 25px;
-  box-shadow: var(--shadow-lg);
-  margin: 0 20px 25px 20px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+.chips {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 20px;
-  border: 3px solid var(--border);
+  gap: var(--s-2);
+  min-height: 32px;
+  margin-top: var(--s-4);
 }
 
-.notificationIcon {
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  flex-shrink: 0;
-}
-
-[data-theme="dark"] .notificationIcon {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-}
-
-.notificationText {
-  flex: 1;
-  color: var(--text);
-  font-size: 15px;
-}
-
-.notificationAction {
-  color: var(--primary);
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: transform 0.3s ease;
-}
-
-.notificationAction:hover {
-  transform: scale(1.05);
-}
-
-/* Daily Mission */
-.dailyMission {
-  background: linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%);
-  border-radius: 20px;
-  padding: 25px 30px;
-  margin: 0 20px 30px 20px;
-  box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  border: 5px solid white;
-}
-
-.missionIcon {
-  width: 60px;
-  height: 60px;
-  background: rgba(0,0,0,0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  flex-shrink: 0;
-}
-
-.missionContent {
-  flex: 1;
-}
-
-.missionContent h3 {
-  color: white;
-  font-size: 24px;
-  margin-bottom: 5px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.missionContent p {
-  color: rgba(255,255,255,0.9);
-  font-size: 15px;
-  margin: 0;
-}
-
-.acceptBtn {
-  background: rgba(0,0,0,0.3);
-  color: white;
-  border: none;
-  padding: 12px 30px;
-  border-radius: 25px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: inherit;
-}
-
-.acceptBtn:hover {
-  background: rgba(0,0,0,0.5);
-  transform: scale(1.05);
-}
-
-/* Section Title */
-.sectionTitle {
-  font-size: 28px;
-  color: var(--text);
-  margin-bottom: 20px;
-  color: #1a1a1a;
-  margin: 0 20px 20px 20px;
-  font-weight: bold;
-}
-
-/* Subjects Grid */
-.subjectsGrid {
+/* Seven-day streak: hairline-free block under the chips. */
+.streak {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 25px;
-  margin: 0 20px 30px 20px;
+  gap: var(--s-2);
+  margin-top: var(--s-4);
 }
 
-.subjectCard {
-  background: var(--card);
-  border-radius: 20px;
-  padding: 25px;
-  box-shadow: var(--shadow-lg);
-  border: 5px solid transparent;
-  transition: all 0.3s ease;
-  cursor: pointer;
+.streak .micro {
+  margin: 0;
 }
 
-.subjectCard:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-xl);
+.streakPath {
+  gap: var(--s-2);
 }
 
-.subjectCard.math {
-  border-color: #4FACFE;
+/* Mobile: the stop, then the doors. Stacked in source order. */
+.path {
+  display: block;
 }
 
-[data-theme="dark"] .subjectCard.math {
-  border-color: var(--primary);
+.section {
+  margin-top: var(--s-6);
+  min-width: 0;
 }
 
-.subjectCard.english {
-  border-color: #FFD700;
+.section .micro {
+  margin-bottom: var(--s-3);
 }
 
-[data-theme="dark"] .subjectCard.english {
-  border-color: var(--warning);
+.stopWrap {
+  display: block;
 }
 
-.subjectHeader {
+.errorWrap {
+  display: grid;
+  gap: var(--s-2);
+  justify-items: start;
+}
+
+.doors {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+}
+
+.door {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-2);
+  min-width: 0;
+  min-height: 96px;
+  padding: var(--s-4);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.door:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.iconMath {
+  color: var(--math-ink);
+}
+
+.iconEnglish {
+  color: var(--english-ink);
+}
+
+.doorName {
+  font-family: var(--font-ui);
+  font-size: var(--type-ui);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+}
+
+.doorPath {
+  gap: var(--s-1);
+}
+
+/* Trophy shelf and weekly goal share one hairline panel style. */
+.lower {
+  display: grid;
+  gap: var(--s-4);
+  margin-top: var(--s-6);
+}
+
+.panel {
+  display: grid;
+  align-content: start;
+  gap: var(--s-3);
+  min-width: 0;
+  padding: var(--s-4);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.shelfTitle {
+  margin: 0;
+  font-family: var(--font-story);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.trophies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3) var(--s-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trophy {
   display: flex;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 20px;
+  gap: var(--s-2);
+  min-width: 0;
+  max-width: 100%;
 }
 
-.subjectIconBox {
-  width: 60px;
-  height: 60px;
-  background: var(--bg);
-  border-radius: 15px;
-  display: flex;
+.tile {
+  display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  background: var(--surface-soft);
+  color: var(--accent);
 }
 
-.subjectInfo {
-  flex: 1;
-}
-
-.subjectInfo h3 {
-  color: var(--text);
-  font-size: 22px;
-  margin-bottom: 5px;
-}
-
-.subjectPercentage {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.subjectCard.math .subjectPercentage {
-  color: #4FACFE;
-}
-
-[data-theme="dark"] .subjectCard.math .subjectPercentage {
-  color: var(--primary);
-}
-
-.subjectCard.english .subjectPercentage {
-  color: #FFD700;
-}
-
-[data-theme="dark"] .subjectCard.english .subjectPercentage {
-  color: var(--warning);
-}
-
-.subjectProgressBar {
-  background: var(--bg-secondary);
-  height: 12px;
-  border-radius: 6px;
-  overflow: hidden;
-  margin-bottom: 15px;
-}
-
-[data-theme="dark"] .subjectProgressBar {
-  background: var(--border);
-}
-
-.subjectProgressFill {
-  height: 100%;
-  border-radius: 6px;
-  transition: width 0.5s ease;
-}
-
-.subjectCard.math .subjectProgressFill {
-  background: linear-gradient(90deg, #4FACFE 0%, #00F2FE 100%);
-}
-
-[data-theme="dark"] .subjectCard.math .subjectProgressFill {
-  background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
-}
-
-.subjectCard.english .subjectProgressFill {
-  background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
-}
-
-[data-theme="dark"] .subjectCard.english .subjectProgressFill {
-  background: linear-gradient(90deg, var(--warning) 0%, #FFA500 100%);
-}
-
-.subjectDetails {
-  color: var(--text-secondary);
-  font-size: 13px;
-  margin-bottom: 15px;
-}
-
-.learnBtn {
-  background: transparent;
-  color: #4FACFE;
-  border: 2px solid #4FACFE;
-  padding: 10px 25px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: inherit;
-}
-
-.learnBtn:hover {
-  background: #4FACFE;
-  color: white;
-}
-
-[data-theme="dark"] .learnBtn {
-  color: var(--primary);
-  border-color: var(--primary);
-}
-
-[data-theme="dark"] .learnBtn:hover {
-  background: var(--primary);
-  color: white;
-}
-
-.subjectCard.english .learnBtn {
-  color: #FFD700;
-  border-color: #FFD700;
-}
-
-.subjectCard.english .learnBtn:hover {
-  background: #FFD700;
-  color: #1a1a1a;
-}
-
-[data-theme="dark"] .subjectCard.english .learnBtn {
-  color: var(--warning);
-  border-color: var(--warning);
-}
-
-[data-theme="dark"] .subjectCard.english .learnBtn:hover {
-  background: var(--warning);
-  color: #1a1a1a;
-}
-
-/* Badges Section */
-.badgesSection {
-  margin: 0 20px 30px 20px;
-}
-
-.badgesHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+.trophyName {
+  font-family: var(--font-ui);
+  font-size: var(--type-ui);
+  font-weight: 600;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  color: var(--ink);
 }
 
 .viewAll {
-  color: var(--primary);
-  font-size: 14px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: transform 0.3s ease;
-}
-
-.viewAll:hover {
-  transform: scale(1.05);
-}
-
-.badgesGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 20px;
-}
-
-.badgeItem {
-  background: var(--card);
-  border-radius: 15px;
-  padding: 20px;
-  text-align: center;
-  box-shadow: var(--shadow-md);
-  border: 3px solid var(--warning);
-  transition: all 0.3s ease;
-  cursor: pointer;
-  position: relative;
-}
-
-.badgeItem:hover {
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
-}
-
-.badgeItem.locked {
-  background: var(--bg-secondary);
-  border-color: var(--border);
-  opacity: 0.5;
-}
-
-.badgeEmoji {
-  font-size: 56px;
-  margin-bottom: 10px;
-  display: block;
-  animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.badgeItem.locked .badgeEmoji {
-  animation: none;
-}
-
-.badgeCheck {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background: #4FACFE;
-  color: white;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  font-size: 14px;
-}
-
-.badgeName {
-  font-size: 11px;
-  color: #333;
+  justify-self: start;
+  min-height: 48px;
+  font-family: var(--font-ui);
+  font-size: 16px;
   font-weight: 600;
-  margin-top: 5px;
-  text-align: center;
-  line-height: 1.2;
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
 }
 
-.badgeItem.locked .badgeName {
-  color: #999;
+.viewAll:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
 }
 
-/* Weekly Goal Widget */
-.weeklyGoal {
-  background: var(--card);
-  border-radius: 20px;
-  padding: 25px;
-  box-shadow: var(--shadow-lg);
-  border: 3px solid var(--warning);
-  margin: 0 20px 20px 20px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-  border: 3px solid #FFD700;
+.weekPath {
+  gap: var(--s-3);
 }
 
-.weeklyGoal h3 {
-  font-size: 18px;
-  color: var(--text);
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+@media (hover: hover) and (pointer: fine) {
+  .door:hover {
+    border-color: var(--accent);
+  }
 
-.weeklyGoal p {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin-bottom: 15px;
-}
-
-.weeklyProgress {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-weight: bold;
-}
-
-.weeklyBar {
-  background: var(--bg-secondary);
-  height: 12px;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-[data-theme="dark"] .weeklyBar {
-  background: var(--border);
-}
-
-.weeklyBarFill {
-  background: linear-gradient(90deg, #FF6B6B 0%, #FFA500 100%);
-  height: 100%;
-  border-radius: 6px;
-  transition: width 0.5s ease;
-}
-
-[data-theme="dark"] .weeklyBarFill {
-  background: linear-gradient(90deg, var(--error) 0%, var(--warning) 100%);
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .subjectsGrid {
-    grid-template-columns: 1fr;
+  .viewAll:hover {
+    color: var(--accent-hover);
   }
 }
 
-@media (max-width: 768px) {
-  .heroBanner {
+/* Desktop: primary stop on the left, the two doors stacked on the right. */
+@media (min-width: 900px) {
+  .path {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: var(--s-4);
+    align-items: stretch;
+    margin-top: var(--s-6);
+  }
+
+  .section {
+    display: flex;
     flex-direction: column;
-    text-align: center;
-    padding: 30px 20px;
+    margin-top: 0;
   }
 
-  .heroContent h1 {
-    font-size: 32px;
-  }
-
-  .heroContent p {
-    font-size: 16px;
-  }
-
-  .heroAvatar {
-    width: 100px;
-    height: 100px;
-    font-size: 50px;
-  }
-
-  .levelCard {
-    padding: 15px 20px;
-  }
-
-  .levelLabel {
-    font-size: 16px;
-  }
-
-  .dailyMission {
+  .stopWrap {
+    display: flex;
     flex-direction: column;
-    text-align: center;
-    padding: 20px;
+    flex: 1;
   }
 
-  .missionContent h3 {
-    font-size: 20px;
-    justify-content: center;
+  /* Primary stop (or its loading / error stand-in) fills the left column. */
+  .stopWrap > * {
+    flex: 1;
+    min-height: 160px;
   }
 
-  .badgesGrid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  .doors {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    margin-top: 0;
+  }
+
+  .doors > * {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .door {
+    flex: 1;
+    min-height: 120px;
+  }
+
+  /* Shelf and weekly goal side by side; a lone shelf takes the full width. */
+  .lower {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lower > :only-child {
+    grid-column: 1 / -1;
   }
 }
-
-@media (max-width: 480px) {
-  .homeContainer {
-    padding: 12px;
-  }
-
-  .heroContent h1 {
-    font-size: 24px;
-  }
-
-  .heroContent p {
-    font-size: 14px;
-  }
-
-  .specialMissionBtn {
-    padding: 12px 25px;
-    font-size: 16px;
-  }
-
-  .sectionTitle {
-    font-size: 22px;
-  }
-
-  .notificationCard {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .subjectCard {
-    padding: 20px;
-  }
-
-  .subjectInfo h3 {
-    font-size: 18px;
-  }
-}
-
-/* Made with Bob */

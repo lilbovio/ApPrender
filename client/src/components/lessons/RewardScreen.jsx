@@ -1,265 +1,167 @@
-import React, { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { apiRequest } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
+import { cleanTitle } from "../../utils/lessonUtils";
+import { recordLessonThisWeek } from "../../utils/weekUtils";
+import Button from "../ui/Button";
+import Icon from "../ui/Icon";
+import InlineError from "../ui/InlineError";
+import Pilo from "../ui/Pilo";
+import { CONFETTI_S, DUR, EASE_JOY, EASE_UI, STAGGER } from "../ui/motion";
+import styles from "./Lesson.module.css";
 
-/**
- * RewardScreen
- * Pantalla de recompensa al terminar una lección.
- * Props:
- *  - score: number (0-100)
- *  - correctAnswers: number
- *  - totalQuestions: number
- *  - xpEarned: number
- *  - onContinue: fn
- *  - onRetry: fn
- *  - lessonTitle: string
- *  - newBadge: { emoji, name } | null
- */
+const CONFETTI_COUNT = 14;
+const FALL_TO = 360;
 
-const STAR_THRESHOLDS = [
-  { min: 80, stars: 3, message: "¡Eres increíble! 🏆", color: "#FFD93D" },
-  { min: 50, stars: 2, message: "¡Muy bien hecho! 🎉", color: "#4D96FF" },
-  { min: 0,  stars: 1, message: "¡Sigue practicando! 💪", color: "#FF922B" },
-];
-
-function getResult(score) {
-  return STAR_THRESHOLDS.find((t) => score >= t.min) || STAR_THRESHOLDS[2];
-}
-
-// Confeti simple con CSS
+/** Confetti runs once on mount, then unmounts. Never rendered under reduced motion. */
 function Confetti() {
-  const pieces = Array.from({ length: 22 }, (_, i) => ({
-    id: i,
-    color: ["#FF6B6B","#FFD93D","#6BCB77","#4D96FF","#CC5DE8","#FF922B"][i % 6],
-    left: `${4 + i * 4.2}%`,
-    delay: `${(i * 0.09).toFixed(2)}s`,
-    duration: `${1.2 + (i % 4) * 0.3}s`,
-    size: 8 + (i % 4) * 4,
-  }));
+  const pieces = Array.from({ length: CONFETTI_COUNT }, (_, i) => {
+    const delay = i * STAGGER;
+    return {
+      i,
+      left: `${5 + i * 6.4}%`,
+      drift: ((i * 37) % 50) - 25,
+      spin: 120 + ((i * 53) % 240),
+      delay,
+      // Every piece lands at CONFETTI_S, so the whole burst lasts 2.4 s.
+      duration: CONFETTI_S - delay,
+    };
+  });
 
   return (
-    <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 999 }}>
+    <div className={styles.confettiLayer} aria-hidden="true">
       {pieces.map((p) => (
-        <div
-          key={p.id}
-          style={{
-            position: "absolute",
-            top: "-10%",
-            left: p.left,
-            width: p.size,
-            height: p.size,
-            background: p.color,
-            borderRadius: p.id % 3 === 0 ? "50%" : 3,
-            animation: `fall ${p.duration} ${p.delay} ease-in forwards`,
-            opacity: 0,
-          }}
+        <motion.span
+          key={p.i}
+          className={`${styles.confetti} ${styles[`tone${p.i % 6}`]}`}
+          style={{ left: p.left }}
+          initial={{ y: -20, x: 0, rotate: 0, opacity: 0 }}
+          animate={{ y: FALL_TO, x: p.drift, rotate: p.spin, opacity: [0, 1, 1, 0] }}
+          transition={{ duration: p.duration, delay: p.delay, ease: "easeIn" }}
         />
       ))}
-      <style>{`
-        @keyframes fall {
-          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-          100% { transform: translateY(110vh) rotate(540deg); opacity: 0; }
-        }
-      `}</style>
     </div>
   );
 }
 
-export default function RewardScreen({
-  score = 0,
-  correctAnswers = 0,
-  totalQuestions = 0,
-  xpEarned = 0,
-  onContinue,
-  onRetry,
-  lessonTitle = "Lección",
-  newBadge = null,
-}) {
-  const result = getResult(score);
-  const [showConfetti, setShowConfetti] = useState(result.stars === 3);
-  const [starsShown, setStarsShown] = useState(0);
+/**
+ * RewardScreen — what the child learned, one pastel block, one primary action.
+ * Saves progress once on mount. A failed save shows a friendly retry; Continue stays usable.
+ */
+export default function RewardScreen({ lesson, firstTry = 0, total = 0, onContinue, onSeeBadges }) {
+  const reduce = useReducedMotion();
+  const { user } = useAuth();
+  const userId = user?._id;
+  const xp = lesson.xp || 50;
+  const [saveState, setSaveState] = useState("saving"); // "saving" | "saved" | "error"
+  const [streak, setStreak] = useState(0);
+  const [errorKey, setErrorKey] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(!reduce);
+  const requested = useRef(false);
+
+  const save = useCallback(async () => {
+    setSaveState("saving");
+    try {
+      const progress = await apiRequest(`/progress/${lesson.subject}/complete`, "POST", {
+        lessonId: lesson._id,
+        xpEarned: xp,
+      });
+      setStreak(Number(progress?.streak) || 0);
+      recordLessonThisWeek(userId, lesson._id);
+      setSaveState("saved");
+    } catch {
+      setSaveState("error");
+      setErrorKey((k) => k + 1);
+    }
+  }, [lesson._id, lesson.subject, xp, userId]);
+
+  // Ref guard: StrictMode runs effects twice in development, but the request goes out once.
+  useEffect(() => {
+    if (requested.current) return;
+    requested.current = true;
+    save();
+  }, [save]);
 
   useEffect(() => {
-    // Animar estrellas una a una
-    let i = 0;
-    const t = setInterval(() => {
-      i++;
-      setStarsShown(i);
-      if (i >= result.stars) clearInterval(t);
-    }, 350);
-    const confettiTimer = setTimeout(() => setShowConfetti(false), 3500);
-    return () => { clearInterval(t); clearTimeout(confettiTimer); };
-  }, [result.stars]);
+    if (reduce || !showConfetti) return undefined;
+    const timer = setTimeout(() => setShowConfetti(false), CONFETTI_S * 1000 + 100);
+    return () => clearTimeout(timer);
+  }, [reduce, showConfetti]);
+
+  const piloMotion = reduce
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: DUR.joy, ease: EASE_UI } }
+    : {
+        initial: { opacity: 0, scale: 0.6 },
+        animate: { opacity: 1, scale: 1 },
+        transition: { duration: DUR.joy, ease: EASE_JOY },
+      };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "linear-gradient(160deg, #EFF6FF 0%, #FFF4E6 100%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 990,
-        padding: 20,
-        fontFamily: "'Nunito', 'Fredoka One', sans-serif",
-      }}
-    >
-      {showConfetti && <Confetti />}
+    <section className={styles.reward}>
+      {showConfetti && !reduce && <Confetti />}
 
-      <div
-        style={{
-          background: "#fff",
-          borderRadius: 32,
-          padding: "36px 32px",
-          maxWidth: 420,
-          width: "100%",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.14)",
-          textAlign: "center",
-          animation: "popIn 0.4s cubic-bezier(.34,1.56,.64,1)",
-        }}
-      >
-        {/* Trophy emoji */}
-        <div style={{ fontSize: 64, marginBottom: 8, lineHeight: 1 }}>
-          {result.stars === 3 ? "🏆" : result.stars === 2 ? "🌟" : "💪"}
+      <div className={styles.hero}>
+        <div className={styles.sticker}>
+          <Icon name="star" size={40} />
         </div>
-
-        {/* Stars */}
-        <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 12 }}>
-          {Array.from({ length: 3 }, (_, i) => (
-            <span
-              key={i}
-              style={{
-                fontSize: 40,
-                filter: i < starsShown ? "none" : "grayscale(1) opacity(0.25)",
-                transition: "filter 0.3s, transform 0.3s",
-                transform: i < starsShown ? "scale(1.15)" : "scale(1)",
-                display: "inline-block",
-              }}
-            >
-              ⭐
-            </span>
-          ))}
-        </div>
-
-        <h2 style={{ margin: "0 0 4px", fontWeight: 900, fontSize: 24, color: result.color }}>
-          {result.message}
-        </h2>
-        <p style={{ margin: "0 0 20px", color: "#64748b", fontWeight: 600, fontSize: 15 }}>
-          {lessonTitle}
-        </p>
-
-        {/* Stats */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: 12,
-            marginBottom: 20,
-          }}
-        >
-          <Stat emoji="✅" value={`${correctAnswers}/${totalQuestions}`} label="Correctas" color="#6BCB77" />
-          <Stat emoji="💯" value={`${score}%`} label="Puntaje" color="#4D96FF" />
-          <Stat emoji="⚡" value={`+${xpEarned}`} label="XP" color="#FFD93D" />
-        </div>
-
-        {/* Badge nuevo */}
-        {newBadge && (
-          <div
-            style={{
-              background: "#FFF9E6",
-              border: "2px solid #FFD93D",
-              borderRadius: 16,
-              padding: "12px 16px",
-              marginBottom: 20,
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              textAlign: "left",
-            }}
-          >
-            <span style={{ fontSize: 32 }}>{newBadge.emoji}</span>
-            <div>
-              <div style={{ fontWeight: 800, fontSize: 14, color: "#92400e" }}>
-                🎉 ¡Nuevo logro!
-              </div>
-              <div style={{ fontWeight: 700, fontSize: 13, color: "#b45309" }}>
-                {newBadge.name}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Botones */}
-        <div style={{ display: "flex", gap: 12, flexDirection: "column" }}>
-          <button
-            onClick={onContinue}
-            style={{
-              background: "#4D96FF",
-              color: "#fff",
-              border: "none",
-              borderRadius: 18,
-              padding: "14px 24px",
-              fontFamily: "'Nunito', sans-serif",
-              fontWeight: 800,
-              fontSize: 17,
-              cursor: "pointer",
-              boxShadow: "0 6px 0 #1a5bbf",
-              transition: "all 0.15s",
-              width: "100%",
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "#2979e8"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "#4D96FF"; }}
-          >
-            ¡Continuar! 🚀
-          </button>
-
-          {result.stars < 3 && onRetry && (
-            <button
-              onClick={onRetry}
-              style={{
-                background: "transparent",
-                color: "#64748b",
-                border: "2px solid #e2e8f0",
-                borderRadius: 18,
-                padding: "12px 24px",
-                fontFamily: "'Nunito', sans-serif",
-                fontWeight: 700,
-                fontSize: 15,
-                cursor: "pointer",
-                width: "100%",
-              }}
-            >
-              Intentar de nuevo 🔄
-            </button>
-          )}
-        </div>
+        <motion.div className={styles.pilo} {...piloMotion}>
+          <Pilo size={72} label="Pilo" />
+        </motion.div>
       </div>
 
-      <style>{`
-        @keyframes popIn {
-          from { transform: scale(0.8); opacity: 0 }
-          to { transform: scale(1); opacity: 1 }
-        }
-      `}</style>
-    </div>
-  );
-}
+      <div className={styles.celebrate}>
+        <p className={styles.micro}>Lo que aprendiste</p>
+        <h1 className={styles.rewardTitle}>{cleanTitle(lesson.title)}</h1>
+        <p className={styles.rewardMeta}>{`${firstTry} de ${total} a la primera · +${xp} XP`}</p>
+      </div>
 
-function Stat({ emoji, value, label, color }) {
-  return (
-    <div
-      style={{
-        background: `${color}14`,
-        borderRadius: 16,
-        padding: "10px 8px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 2,
-      }}
-    >
-      <span style={{ fontSize: 20 }}>{emoji}</span>
-      <span style={{ fontWeight: 800, fontSize: 18, color }}>{value}</span>
-      <span style={{ fontWeight: 600, fontSize: 11, color: "#64748b" }}>{label}</span>
-    </div>
+      <div className={styles.path} role="img" aria-label={`${firstTry} de ${total} a la primera`}>
+        {Array.from({ length: total }, (_, i) => {
+          if (i >= firstTry) {
+            return (
+              <span key={i} className={styles.starUnlit}>
+                <Icon name="star" size={28} />
+              </span>
+            );
+          }
+          return (
+            <motion.span
+              key={i}
+              className={styles.starLit}
+              initial={{ opacity: 0.2 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: DUR.micro, ease: EASE_UI, delay: reduce ? 0 : i * STAGGER }}
+            >
+              <Icon name="star" size={28} />
+            </motion.span>
+          );
+        })}
+      </div>
+
+      {saveState === "saved" && streak > 0 && (
+        <div className={styles.hairline}>
+          <p>{`Tu racha sigue viva: ${streak} ${streak === 1 ? "día" : "días"}.`}</p>
+        </div>
+      )}
+
+      {saveState === "error" && (
+        <div className={styles.saveRow}>
+          <InlineError shakeKey={errorKey}>Casi. No pudimos guardar tu progreso. Prueba otra vez.</InlineError>
+          <Button variant="quiet" onClick={save}>
+            Guardar otra vez
+          </Button>
+        </div>
+      )}
+
+      <div className={styles.actions}>
+        <Button variant="primary" fullWidth iconRight="arrow" onClick={onContinue}>
+          Continuar mi camino
+        </Button>
+        <Button variant="quiet" onClick={onSeeBadges}>
+          Ver mis logros
+        </Button>
+      </div>
+    </section>
   );
 }
